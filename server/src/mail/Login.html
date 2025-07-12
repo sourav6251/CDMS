@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDMS - Login Notification</title>
+    <style>
+        /* Reset styles for email compatibility */
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-sizing: border-box;
+            line-height: 1.6;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            padding: 20px 0;
+            color: #333;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a2a6c, #3a7bd5);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .logo-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .title {
+            font-size: 24px;
+            color: #1a2a6c;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .success-icon {
+            text-align: center;
+            margin: 20px 0 30px;
+        }
+        
+        .success-icon svg {
+            width: 80px;
+            height: 80px;
+            fill: #28a745;
+        }
+        
+        .message {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #444;
+            text-align: center;
+        }
+        
+        .login-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            border-left: 4px solid #28a745;
+        }
+        
+        .detail-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            flex: 0 0 150px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: #333;
+        }
+        
+        .security-tip {
+            background: #e8f4ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid #3a7bd5;
+        }
+        
+        .security-tip h3 {
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+        
+        .action-buttons {
+            text-align: center;
+            margin: 30px 0 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 28px;
+            margin: 0 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #1a2a6c;
+            color: white;
+            border: 1px solid #1a2a6c;
+        }
+        
+        .btn-primary:hover {
+            background: #3a7bd5;
+            border-color: #3a7bd5;
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #1a2a6c;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 25px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        .footer-links {
+            margin-top: 15px;
+        }
+        
+        .footer-links a {
+            color: #3a7bd5;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .support {
+            text-align: center;
+            margin-top: 25px;
+            color: #555;
+        }
+        
+        @media (max-width: 480px) {
+            .content {
+                padding: 30px 15px;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+            }
+            
+            .detail-label {
+                margin-bottom: 5px;
+            }
+            
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                margin: 5px 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">CDMS</div>
+            <div class="logo-subtitle">Computer Science Department Management System</div>
+        </div>
+        
+        <div class="content">
+            <h1 class="title">Successful Login Detected</h1>
+            
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" />
+                </svg>
+            </div>
+            
+            <p class="message">Hello [Recipient Name],</p>
+            <p class="message">We detected a successful login to your CDMS account. If this was you, no action is required.</p>
+            
+            <div class="login-details">
+                <div class="detail-row">
+                    <div class="detail-label">Login Time:</div>
+                    <div class="detail-value">[Date] at [Time] (UTC)</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Device:</div>
+                    <div class="detail-value">[Device Type] ([Operating System])</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Browser:</div>
+                    <div class="detail-value">[Browser Name] v[Browser Version]</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Location:</div>
+                    <div class="detail-value">[City], [Region], [Country] (Approximate)</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">IP Address:</div>
+                    <div class="detail-value">[IP Address]</div>
+                </div>
+            </div>
+            
+            <div class="security-tip">
+                <h3>Security Tip</h3>
+                <p>If you don't recognize this login activity, it could mean someone else has accessed your account. We recommend changing your password immediately.</p>
+            </div>
+            
+            <!-- <div class="action-buttons">
+                <a href="#" class="btn btn-primary">Go to CDMS Dashboard</a>
+                <a href="#" class="btn btn-secondary">View Account Activity</a>
+            </div> -->
+            
+            <!-- <div class="support">
+                Need assistance? Contact CDMS Support: 
+                <a href="mailto:support@csdept.edu">support@csdept.edu</a>
+            </div> -->
+        </div>
+        
+        <div class="footer">
+            <p>Computer Science Department Management System (CDMS)</p>
+            <p>Department of Computer Science, Panskura Banamali College</p>
+            
+            <!-- <div class="footer-links">
+                <a href="#">CDMS Home</a> | 
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Security Center</a>
+            </div> -->
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,219 @@
+----------------------------- PBC ONLINE ----------------------------------
+
+1. deparmantal HOD 
+     - syllebus create 
+     - routin Genarate 
+     - metting organize
+     - Notification Create 
+
+2 . Faculty 
+     - syllebus show  
+     - routin show  
+     - metting show
+     - Notification show 
+     - Notification show ( for class scheduling ) 
+
+3 . Studens 
+     - syllebus show  
+     - routin show  
+     - Notification show 
+
+
+4 . external 
+    - metting scheduling
+    - syllebus show 
+    - certificate Genarate
+
+
+------------------------ database design ------------------
+table info ---
+
+   user : [ "admin", "hod", "faculty", "student" , "external" ]
+
+   1 . user 
+   - name 
+   - email 
+   - ph No
+   - profile-pic 
+
+      
+   2. deperments -(Super-admin)
+      - _id (auto Genarate)
+      - name  - string 
+      - capacity - number
+      - totalFaculty - number
+      - email 
+
+    3 . sems
+      - name 
+      - deperment (deparmantalId)
+      - subjects :[
+        {
+            paperCode : -string
+            paperName : -string
+        }
+      ]
+
+   
+    4 . hods -(admin)
+       - user (userId)
+       - deperment (deparmantalId)
+       - 
+    
+
+    5 . facultys -hods
+       - user (userId)
+       - deperment (deparmantalId)
+       - subjects : []
+       - 
+
+    
+    6. Studens : - 
+       - user (userId)
+       - deperment (deparmantalId)
+       - sem 
+    
+    7. notifications
+      - title 
+      - description 
+      - media (image/pdf)
+      - user (user id)
+      - deperment (deparmantalId)
+    
+    8. syllebus
+       - user (user id)
+       - deperment (deparmantalId)
+       - sem (semId )
+       - paperCode
+       - paperName
+       - media (pdf / image )
+
+    9 . metting 
+      - user (user Id)
+      - title
+      - description
+      - mettingTime 
+      - joinusList : [ email ]
+      - mettingArea : string
+
+    10. certificates : - (external)
+      - user (user Id) 
+      - deperment (deparmantalId)
+      - sem (semId)
+      - paperCode
+      - paperName
+      - studensNo : number 
+      - doe : date  
+      - designation 
+
+    11. externals : - (hod)
+       - user (userId)
+       - deperment (deparmantalId)
+       - sem (semid)
+       - paperCode
+       - paperName
+       - doe : date 
+       
+
+    12 . routins - 
+       - user
+       - deparmanta
+       - sem
+       - day : name : string
+       
+
+       13. daybaseroutins :
+          - routin
+          - dayRoutin : {
+               paperCode : string
+               prof : user
+               StartingTime : date 
+               Endingtime : date 
+          }
+
+
+    
+    sukanta - deparmanta , sem , routin 
+    sourav - metting , certificate , syllebus , 
+    tarak - hod , faculty , Studens , external , notifications
+
+    
+    -------------------------- API creation  ---------------------------------------
+
+     I . ------------------------ syllebus --------------------------
+      
+      base path : api/v1/syllebus
+
+       1. create - (post method)
+         - authenticate 
+         - only hod can create syllebus
+         - payload : {
+              - userId ,
+              - deparmantalId ,
+              - semId ,
+              - paperCode
+              - paperName
+              - media  
+           }
+         
+      2. update - (patch method)
+         - authenticate 
+         - only hod can update syllebus
+         - payload :
+            body : {
+              - userId ,
+              - deparmantalId ,
+              - semId ,
+              - paperCode
+              - paperName
+              - media  
+           } 
+           params : { syllebusId }
+
+      3. delete - (delete method)
+         - authenticate 
+         - only hod can delete syllebus
+         - payload : param : { syllebusId }
+
+   
+  ( II ) ------------------------ routins --------------------------
+
+      base url : api/v1/routins
+
+      1. create - (post method)
+         - authenticate 
+         - only hod can create routins
+         - payload : {
+              - userId ,
+              - deparmantalId ,
+              - semId ,
+              - routin 
+         }
+
+   ( III ) ------------------------ notifications --------------------------
+
+      base url : api/v1/notifications
+
+      1. create - (post method)
+         - authenticate 
+         - only hod can create notifications
+         - payload : 
+            body : {
+
+            }
+      
+      2. update - (patch method)
+         - authenticate 
+         - only hod can update notifications
+         - payload : 
+            body : {
+
+            }
+            params : { notificationId }
+      
+      3. delete - (delete method)
+         - authenticate 
+         - only hod can delete notifications
+         - payload : param : { notificationId }
+
+      

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CDMS - Account Deleted</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #3a7bd5);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .email-container {
+      background: #fff;
+      max-width: 600px;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a2a6c, #3a7bd5);
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.85;
+    }
+
+    .content {
+      padding: 30px 20px;
+      color: #333;
+    }
+
+    .content h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      text-align: center;
+      color: #1a2a6c;
+    }
+
+    .message {
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .highlight {
+      font-weight: bold;
+      color: #1a2a6c;
+    }
+
+    .detail {
+      background: #f0f4ff;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      font-size: 15px;
+    }
+
+    .detail-item {
+      margin-bottom: 10px;
+    }
+
+    .detail-label {
+      color: #777;
+      font-weight: 600;
+    }
+
+    .detail-value {
+      color: #333;
+      font-weight: 600;
+    }
+
+    .consequences {
+      background: #fff5f5;
+      border-left: 4px solid #d9534f;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .consequences h3 {
+      color: #d9534f;
+      margin-bottom: 10px;
+    }
+
+    .consequences ul {
+      padding-left: 20px;
+    }
+
+    .consequences li {
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 30px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      transition: 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, #1a2a6c, #3a7bd5);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #1a2a6c;
+      border: 2px solid #1a2a6c;
+    }
+
+    .btn-secondary:hover {
+      background: #f5f7ff;
+    }
+
+    .footer {
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+      background: #f8f9fa;
+      color: #555;
+    }
+
+    @media (min-width: 480px) {
+      .actions {
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      .btn {
+        width: auto;
+        min-width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>CDMS</h1>
+      <p>Computer Science Department Management System</p>
+    </div>
+
+    <div class="content">
+      <h2>Account Deleted</h2>
+      <p class="message">
+        Hello <span class="highlight">{{name}}</span>,<br />
+        Your CDMS account has been <span class="highlight">permanently deleted</span> as requested.
+      </p>
+
+      <div class="detail">
+        <div class="detail-item">
+          <div class="detail-label">Account Email</div>
+          <div class="detail-value">{{email}}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Deletion Date</div>
+          <div class="detail-value">[Date] at [Time] UTC</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Reference ID</div>
+          <div class="detail-value">CDMS-DEL-[UniqueID]</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Initiated By</div>
+          <div class="detail-value">[User Name]</div>
+        </div>
+      </div>
+
+      <div class="consequences">
+        <h3>What This Means</h3>
+        <ul>
+          <li>Your personal information is permanently removed.</li>
+          <li>All course access and services have ended.</li>
+          <li>Academic records are archived per policy.</li>
+          <li>Pending requests are cancelled.</li>
+          <li>No further communication will be sent.</li>
+        </ul>
+      </div>
+
+      <!-- <div class="actions">
+        <a href="mailto:support@csdept.edu" class="btn btn-primary">Contact Support</a>
+        <a href="#" class="btn btn-secondary">Visit Website</a>
+      </div> -->
+    </div>
+
+    <div class="footer">
+      Department of Computer Science, Panskura Banamali College<br />
+      CDMS
+    </div>
+  </div>
+</body>
+</html>

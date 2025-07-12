@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CDMS Meeting Invitation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #3a7bd5);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .email-container {
+      max-width: 700px;
+      width: 100%;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+      color: #333;
+    }
+    .header {
+      background: linear-gradient(135deg, #1a2a6c, #3a7bd5);
+      padding: 40px 30px;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+    .logo {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+    }
+    .logo-subtitle {
+      font-size: 18px;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+    .invitation-badge {
+      background: #ff6b6b;
+      color: white;
+      display: inline-block;
+      padding: 10px 25px;
+      border-radius: 50px;
+      font-weight: 700;
+      margin-top: 25px;
+      font-size: 20px;
+    }
+    .content {
+      padding: 50px 40px;
+    }
+    .title {
+      font-size: 30px;
+      color: #1a2a6c;
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 25px;
+    }
+    .message {
+      font-size: 18px;
+      margin-bottom: 25px;
+      color: #444;
+      line-height: 1.8;
+      text-align: center;
+    }
+    .meeting-details {
+      background: #f8f9ff;
+      border-radius: 20px;
+      padding: 40px;
+      margin: 35px 0;
+      border: 2px dashed #e0e7ff;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+    
+    }
+    .detail-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      margin-top: 3px;
+      margin-bottom: 3px;
+    }
+    .detail-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .detail-label {
+      font-size: 16px;
+      color: #777;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .detail-value {
+      font-size: 20px;
+      color: #333;
+      font-weight: 700;
+    }
+    .description-box {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 35px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      border-left: 4px solid #3a7bd5;
+    }
+    .description-title {
+      color: #1a2a6c;
+      margin-bottom: 20px;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .description-content {
+      font-size: 17px;
+      line-height: 1.8;
+      color: #444;
+    }
+    .footer {
+      background: #f8f9fa;
+      padding: 35px 25px;
+      text-align: center;
+      color: #666;
+      font-size: 16px;
+      border-top: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <div class="logo">CDMS</div>
+      <div class="logo-subtitle">Computer Science Department Management System</div>
+      <div class="invitation-badge">Meeting Invitation</div>
+    </div>
+    <div class="content">
+      <h1 class="title">You're Invited to a Meeting</h1>
+      <!-- <p class="message">Hello,</p> -->
+      <p class="message">You have been invited to a meeting regarding <strong>{{title}}</strong>. Please find the meeting details below.</p>
+
+      <div class="meeting-details">
+        <div class="detail-grid">
+          <div class="detail-card">
+            <div class="detail-icon">📅</div>
+            <div class="detail-label">Date</div>
+            <div class="detail-value">{{date}}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-icon">⏰</div>
+            <div class="detail-label">Time</div>
+            <div class="detail-value">{{time}}</div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-icon">📍</div>
+            <div class="detail-label">Location</div>
+            <div class="detail-value">{{location}}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="description-box">
+        <h2 class="description-title">
+          📝 Meeting Description
+        </h2>
+        <div class="description-content">
+          {{description}}
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <p>Computer Science Department Management System (CDMS)</p>
+      <p>Department of Computer Science, Panskura Banamali College</p>
+    </div>
+  </div>
+</body>
+</html>

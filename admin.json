@@ -1,0 +1,20 @@
+
+{
+  "name": "sourav",
+  "email": "admin@gmail.icom",
+  "password": "$2b$10$JAosVN6aU64Cz2eW64KzXu8wOGN78bVrAjhnxkQgvQjcZ1u3NCgEK",
+  "profile_pic": {
+    "url": "https://res.cloudinary.com/dab0ekhmy/image/upload/v1728130610/thik-ai/gvjpvq3xljmnw2vwdkag.avif",
+    "public_id": null
+  },
+  "role": "admin",
+  "isVerify": false,
+  "isApproved": false,
+  "createdAt": {
+    "$date": "2025-07-11T15:54:45.306Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-11T15:54:45.306Z"
+  },
+  "__v": 0
+}

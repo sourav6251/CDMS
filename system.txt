@@ -1,0 +1,7 @@
+1. Update your branch
+2. Pull request : git pull origin main
+3. git add .
+4. git commit -m "message"
+5. git checkout -b dev-sukanta   //if not present
+6. pit push origin main dev-sukanta
+7. Go to website ---> request compare and merge 
