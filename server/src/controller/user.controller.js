@@ -199,7 +199,7 @@ class UserController {
     }
     async hoddelete(req, res) {
         try {
-            const { id } = req.params.userID;
+            const id  = req.params.userID;
             await userService.hoddelete(id);
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
@@ -270,11 +270,11 @@ class UserController {
 
     async updatePassword(req, res) {
         try {
-            const { email, newPasswrd } = req.body;
+            const { email, newPassword } = req.body;
 
             const response = await userService.updatePassword({
                 email,
-                newPasswrd,
+                newPassword,
             });
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
@@ -283,7 +283,7 @@ class UserController {
                 data: response,
             });
         } catch (error) {
-            sendCookie(res, {
+            sendResponse(res, {
                 status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
                 success: false,
                 message: "Failed to update password.",

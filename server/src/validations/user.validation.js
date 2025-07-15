@@ -70,7 +70,7 @@ class UserValidation {
     updatePassword = z.object({
         body: z.object({
             email: z.string().email("Invalid email format"),
-            newPasswrd: z
+            newPassword: z
                 .string()
                 .min(8, "New password must be at least 8 characters"),
         }),

@@ -20,7 +20,7 @@ router
     .post("/verify_otp",validate(userValidation.verifyOtp),userController.verifyOtp)
     .get("/getuser", isAuthenticate, userController.getUserById)
     .get("/getalluser",isAuthenticate,authorizeRoles("admin","hod"),userController.getAllUser)
-    .delete("/",isAuthenticate,userController.deleteUser)
+    // .delete("/",isAuthenticate,userController.deleteUser)
     .put("/",isAuthenticate,validate(userValidation.updateUser),upload.single("photo") ,userController.updateUser)
     .get("/logout",isAuthenticate,userController.logout)
     .put("/update_password",validate(userValidation.updatePassword),isAuthenticate,userController.updatePassword)
