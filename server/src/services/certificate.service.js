@@ -12,6 +12,7 @@ class CertificateService {
         designation,
         department,
         college,
+        subject,
         address,
         examType,
         year,
@@ -31,17 +32,13 @@ class CertificateService {
             let userRefId = null;
             let userModel = "";
 
-            // ⚠️ 1. Handle if nonExistUser is sent
             if (nonExistUser.length > 0) {
-                const { name, email, phoneNo } = nonExistUser[0]; // assuming one object
-
-                // Check if user already exists in normaluser
+                const { name, email, phoneNo } = nonExistUser[0]; 
                 let normalUser = await NormalUser.findOne({
                     name,
                     email,
                 });
 
-                // If not exists, create
                 if (!normalUser) {
                     normalUser = await NormalUser.create({
                         name,
@@ -62,6 +59,23 @@ class CertificateService {
                     userModel = "user";
                 } else {
                     const normalUser = await NormalUser.findById(userID);
+                    if (normalUser) {
+                        userRefId = normalUser._id;
+                        userModel = "normaluser";
+                    } else {
+                        throw new Error(
+                            "Provided userID not found in either user or normaluser."
+                        );
+                    }
+                }
+            }  
+            else if (id) {
+                const systemUser = await Users.findById(id);
+                if (systemUser) {
+                    userRefId = systemUser._id;
+                    userModel = "user";
+                } else {
+                    const normalUser = await NormalUser.findById(id);
                     if (normalUser) {
                         userRefId = normalUser._id;
                         userModel = "normaluser";

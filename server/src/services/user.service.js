@@ -16,7 +16,7 @@ class UserService {
             throw new Error("User already exist");
         }
         try {
-            await Users.create({ name, email, password, role });
+          return  await Users.create({ name, email, password, role });
         } catch (error) {
             throw new Error(error.message);
         }
@@ -41,10 +41,10 @@ class UserService {
     }
 
     //todo: add email
-    async generateOtp(id) {
+    async generateOtp(email) {
         const otp = genarate6DigitOtp();
         try {
-            let user = await Users.findById(id);
+            let user = await Users.findOne({email});
             user.otp = otp;
             user.otpExpiary = Date.now() + 5 * 60 * 1000; // OTP valid for 5 minutes
             await user.save();

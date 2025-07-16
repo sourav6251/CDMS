@@ -45,8 +45,8 @@ class UserValidation {
     });
 
     sendOtp = z.object({
-        params: z.object({
-            userID: z.string(),
+        body: z.object({
+            email: z.string(),
         }),
         // body: z.object({
         //     email: z.string().email("Invalid email format"),

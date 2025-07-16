@@ -7,6 +7,11 @@ import imagekitService from "../services/imagekit.service.js";
 class UserController {
     async createUser(req, res) {
         const { password, email, name, role } = req.body;
+        console.log("password=>",password);
+        console.log("email=>",email);
+        console.log("name=>",name);
+        console.log("role=>",role);
+        
         try {
             const result = await userService.createUser({
                 password,
@@ -26,7 +31,11 @@ class UserController {
             let status = HTTP_STATUS.INTERNAL_SERVER_ERROR;
             // let message = RESPONSE_MESSAGES.INTERNAL_ERROR;
             if (
-                error.message == "User already exist" ||
+                error.message == "User already exist"
+            ) {
+                status = HTTP_STATUS.CONFLICT;
+                // message = RESPONSE_MESSAGES.USER_EXIST;
+            }if (
                 error.message === "Can not create HOD"
             ) {
                 status = HTTP_STATUS.BAD_REQUEST;
@@ -74,8 +83,8 @@ class UserController {
 
     async generateOtp(req, res) {
         try {
-            const id = req.params.userID;
-            const otp = await userService.generateOtp(id);
+            const {email} = req.body;
+            const otp = await userService.generateOtp(email);
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
                 success: true,
@@ -99,6 +108,7 @@ class UserController {
                 status: HTTP_STATUS.OK,
                 success: true,
                 message: "OTP verified successfully.",
+                error:"OTP verified successfully."
                 // data: user,
             });
         } catch (error) {
@@ -113,6 +123,7 @@ class UserController {
                 status,
                 success: false,
                 message: error.message,
+                error:error.message,
             });
         }
     }
@@ -135,6 +146,7 @@ class UserController {
                 status,
                 success: false,
                 message: error.message,
+                error: error.message,
             });
         }
     }

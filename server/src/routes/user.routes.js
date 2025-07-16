@@ -12,11 +12,11 @@ import { upload } from "../utils/multerStorage.js";
 const router = express.Router();
 
 router
-    .post("/create",validate(userValidation.createUser),userController.createUser)
+    .post("/create",validate(userValidation.createUser),userController.createUser) //
     .post("/create_hod",validate(userValidation.createUserHod),isAuthenticate,authorizeRoles("admin"),userController.createHod)
     .post("/login", validate(userValidation.login), userController.loginUser)
     // .post("/logins", userController.loginUsers)
-    .post("/send_otp/:userID",validate(userValidation.sendOtp),userController.generateOtp)
+    .post("/send_otp",validate(userValidation.sendOtp),userController.generateOtp)
     .post("/verify_otp",validate(userValidation.verifyOtp),userController.verifyOtp)
     .get("/getuser", isAuthenticate, userController.getUserById)
     .get("/getalluser",isAuthenticate,authorizeRoles("admin","hod"),userController.getAllUser)

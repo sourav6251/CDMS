@@ -10,41 +10,10 @@ import {
 const router = express.Router();
 
 router
-    .post(
-        "/",
-        validate(certificateValidation.create),
-        isAuthenticate,
-        authorizeRoles("hod", "external"),
-        certificateController.createCertificate
-    )
-    .get(
-        "/",
-        isAuthenticate,
-        authorizeRoles("hod", "external"),
-        certificateController.showCertificates
-    )
-
-    .patch(
-        "/:certificateId",
-        validate(certificateValidation.update),
-        isAuthenticate,
-        authorizeRoles("hod", "external"),
-        certificateController.updateCertificate
-    )
-    .put(
-        "/statusupadte/:certificateId",
-        validate(certificateValidation.update),
-        isAuthenticate,
-        authorizeRoles("hod"),
-        certificateController.updateCertificatestatus
-    )
-
-    .delete(
-        "/:certificateId",
-        validate(certificateValidation.delete),
-        isAuthenticate,
-        authorizeRoles("hod", "external"),
-        certificateController.deleteCertificate
-    );
+    .post( "/", validate(certificateValidation.create),isAuthenticate,authorizeRoles("hod", "external"),certificateController.createCertificate)
+    .get("/",isAuthenticate,authorizeRoles("hod", "external"), certificateController.showCertificates)
+    .patch("/:certificateId",validate(certificateValidation.update),isAuthenticate,authorizeRoles("hod", "external"),certificateController.updateCertificate)
+    .put("/statusupadte/:certificateId",validate(certificateValidation.update),isAuthenticate,authorizeRoles("hod"),certificateController.updateCertificatestatus)
+    .delete("/:certificateId",validate(certificateValidation.delete),isAuthenticate,authorizeRoles("hod", "external"),certificateController.deleteCertificate);
 
 export const certificateRouter = router;
