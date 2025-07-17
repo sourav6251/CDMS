@@ -40,7 +40,7 @@ const syllabusSchema = new Schema({
     paperName: {
         type: String,
         // required: [true, "Paper name is required"],
-        maxLength: [10, "Paper name should be at most 10 characters"],
+        maxLength: [50, "Paper name should be at most 10 characters"],
         minLength: [3, "Paper name must be at least 3 characters"],
         trim: true,
     },
