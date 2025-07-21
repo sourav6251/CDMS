@@ -41,7 +41,34 @@ interface CertificateFormData {
     status: string;
     CertificateType: string;
 }
+interface FormData {
+    title: string;
+    description: string;
+    meetingTime: string;
+    meetingArea: string;
+    usersID: string[];
+    users: NewUser[];
+}
+interface NewUser {
+    name: string;
+    email: string;
+    phoneNo?: string;
+}
+interface NoticeFormFields {
+    title: string;
+    description: string;
+    media?: File | null;
+}
 
+interface UpdateNotice{
+    _id: string;
+    title: string;
+    description: string;
+    media: File | null;
+    user: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
 class APIStore {
     handleError = (error: any) => {
         console.log(error);
@@ -65,6 +92,7 @@ class APIStore {
             name: fullName,
             email: registerData.email,
             password: registerData.password,
+            // role: "hod",
             role: registerData.role,
         };
 
@@ -115,7 +143,12 @@ class APIStore {
     login = async (loginData: loginData) => {
         try {
             return await axiosInstance.post("/user/login", loginData);
+
+            toast.success("response");
         } catch (error: any) {
+            // toast.error(error.response.data.message)
+            toast.error("error");
+            // toast.warning("Enter")
             this.handleError(error);
             throw new Error(error.error.status);
         }
@@ -136,10 +169,232 @@ class APIStore {
                 "/certificate",
                 certificate
             );
-            console.log("response=>",response);
-            
+            console.log("response=>", response);
         } catch (error: any) {
-            console.log("response error=>",error);}
+            console.log("response error=>", error);
+        }
     };
+
+    //todo:For certificate
+    getAllExternalUsers = async () => {
+        try {
+            const response = await axiosInstance.get("/user/external");
+            console.log("response=>", response);
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+
+    getMeetingsByParticipantId = async () => {
+        try {
+            const response = await axiosInstance.get("/meeting");
+            console.log("getMeetingsByParticipantId=>", response);
+            toast.success("Featch Meeting successfully");
+            return response.data.data;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+
+    getalluser = async () => {
+        try {
+            const response = await axiosInstance.get("/user/getalluser");
+            console.log("response=>", response);
+            toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    createMeeting = async (payload: FormData) => {
+        try {
+            const response = await axiosInstance.post("/meeting", payload);
+            console.log("response=>", response);
+            toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    updateMeeting = async (meetingID: string, payload: FormData) => {
+        try {
+            console.log("payload=>", payload);
+
+            const response = await axiosInstance.patch(
+                `/meeting/${meetingID}`,
+                payload
+            );
+            // console.log("response=>", response);
+            toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    getallMeeting = async () => {
+        try {
+            const response = await axiosInstance.get("/meeting");
+            console.log("response=>", response);
+            toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    deleteMeeting = async (meetingId: string) => {
+        try {
+            const response = await axiosInstance.delete(
+                `/meeting/${meetingId}`
+            );
+            console.log("response=>", response);
+            toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    notifyMeeting = async (meetingId: string) => {
+        try {
+            const response = await axiosInstance.get(
+                `/meeting/notify/${meetingId}`
+            );
+            console.log("response=>", response);
+            toast.success("Successfully notify");
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    getallNotice = async () => {
+        try {
+            const response = await axiosInstance.get("/noticeboard");
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    addNotice = async (payload: NoticeFormFields) => {
+        console.log("payload=>", payload);
+        const form = new FormData();
+
+        form.append("title", payload.title);
+        form.append("description", payload.description);
+        if (payload.media != null) {
+            form.append("media", payload.media);
+        }
+        try {
+            const response = await axiosInstance.post("/noticeboard", form);
+            console.log("noticeboard response=>", response);
+            toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+
+    deleteNotice = async (noticeId: string) => {
+        try {
+            await axiosInstance.delete(`/noticeboard/${noticeId}`);
+            toast.success("Notice delete successfully");
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    updateNotice = async (noticeId: string,payload: NoticeFormFields) => {
+        const form=new FormData();
+        form.append("title",payload.title)
+        form.append("description",payload.description)
+        if (payload.media!=null) {
+            
+        form.append("media",payload.media)
+        }
+     console.log("form=>",form.get("media"));
+     
+        try {
+            await axiosInstance.patch(`/noticeboard/${noticeId}`,form);
+            toast.success("Notice updated successfully");
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    getallSyllabus = async (semester:string) => {
+        try {
+            const response = await axiosInstance.get("/syllabus",{
+                params: {
+                    semester,
+                },
+            });
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    addSyllabus = async (payload:any) => {
+       
+        try {
+            const response = await axiosInstance.post("/syllabus", payload);
+            console.log("syllabus response=>", response);
+            toast.success("Featch syllabus successfully");
+            
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+    updateSyllabus = async (sylabusID:string,payload:any) => {
+       
+        try {
+            const response = await axiosInstance.patch(`/syllabus/${sylabusID}`, payload);
+            console.log("syllabus response=>", response);
+            toast.success("Featch syllabus successfully");
+            
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+    deleteSyllabus = async (syllabusID:string) => {
+       
+        try {
+            const response = await axiosInstance.delete(`/syllabus/${syllabusID}`, );
+            console.log("syllabus response=>", response);
+            // toast.success("Featch syllabus successfully");
+            
+            return response;
+        } catch (error: any) {
+            this.handleError;
+            throw new Error(error);
+        }
+    };
+
+
 }
 export default new APIStore();
+  

@@ -54,7 +54,9 @@ export const authorizeRoles = (...allowedRoles) => {
       } else {
         console.error("Access denied");
         res.status(403).json({
+          
           message: "Access denied. You do not have the required permissions.",
+          error:"Access denied. You do not have the required permissions.",
         });
       }
     };

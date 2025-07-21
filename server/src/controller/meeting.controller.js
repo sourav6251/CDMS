@@ -75,13 +75,15 @@ class MeetingController {
         try {
             const meetingId = req.params.meetingId;
             const { id } = req.user;
-            const { title, description, meetingTime, meetingArea } = req.body;
+            const { title, description, meetingTime, meetingArea, usersID ,users } = req.body;
             const updatedMeeting = await meetingService.updateMeeting({
                 meetingId,
                 title,
                 description,
                 meetingTime,
                 meetingArea,
+                usersID ,
+                users , 
                 id,
             });
 
@@ -97,6 +99,7 @@ class MeetingController {
                 status = HTTP_STATUS.NOT_FOUND;
             }
             return sendResponse(res, {
+                status,
                 message: RESPONSE_MESSAGES.INTERNAL_ERROR,
                 success: false,
                 error: error.message,

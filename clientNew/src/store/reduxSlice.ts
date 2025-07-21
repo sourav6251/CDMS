@@ -15,7 +15,7 @@ const initialState: userState = {
     isLogin: false,
     userEmail: "String",
     darkMode: false,
-    role: "user",
+    role: "hod",
     profilePic: "https://ik.imagekit.io/eur1zq65p/jwt-hero.png",
 };
 
@@ -34,7 +34,7 @@ const reduxSlice = createSlice({
         },
         logout: (state) => {
             state.isLogin = false;
-            state.role = "";
+            state.role = "hod";
             state.userEmail = "";
             state.profilePic = "https://ik.imagekit.io/eur1zq65p/jwt-hero.png";
         },

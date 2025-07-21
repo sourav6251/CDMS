@@ -8,12 +8,14 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Eye, FilePenLine, Trash, Trash2 } from "lucide-react";
+import { Eye, FilePenLine, Loader, Trash, Trash2, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import PDFPreview from "../common/PDFPreview";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import AuthenticateComponent from "@/utils/AuthenticateComponent";
-// import AuthenticateComponent from "@/components/common/AuthenticateComponent"; // adjust import path if needed
+import apiStore from "@/api/apiStore";
 
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 interface Media {
   url: string;
   public_id: string;
@@ -30,22 +32,52 @@ interface Notice {
 
 interface Props {
   notice: Notice;
+  fetchNotice: () => void;
 }
 
-const MobileNotice: React.FC<Props> = ({ notice }) => {
-  const [open, setOpen] = useState(false);
+interface NoticeFormFields {
+  title: string;
+  description: string;
+  media: File | null;
+}
+const MobileNotice: React.FC<Props> = ({ notice ,fetchNotice}) => {
+const [view,setView]=useState(false)
 
-  const isPDF = (url: string) => url.toLowerCase().endsWith(".pdf");
+    const [loading, setLoading] = useState(false);
+    const [title, setTitle] = useState(notice.title);
+    const [description, setDescription] = useState(notice.description || "");
+    const [file, setFile] = useState<File | null>(null);
+  const isPDF = (url?: string) => {
+    if (!url) return false;
+    return url.toLowerCase().endsWith(".pdf");
+};
+    const handleDelete = async () => {
+        try {
+            await apiStore.deleteNotice(notice._id);
+        } catch (error: any) {
+            console.error(error);
+        } finally {
+            fetchNotice();
+        }
+    };
 
-  const handleEdit = () => {
-    // TODO: add navigation or edit logic
-    console.log("Edit clicked", notice._id);
-  };
+ const updateNotice = async () => {
+        setLoading(true)
+        const form: NoticeFormFields = {
+            title: title,
+            description: description,
+            media: file,
+        };
+        try {
+            await apiStore.updateNotice(notice._id, form);
+            fetchNotice();
+        } catch (err) {
+            console.error(err);
+        }finally{
+        setLoading(false)
+        }
+    };
 
-  const handleDelete = () => {
-    // TODO: call your delete function or confirmation logic
-    console.log("Delete clicked", notice._id);
-  };
 
   return (
     <div className="block md:hidden w-full px-4">
@@ -70,19 +102,57 @@ const MobileNotice: React.FC<Props> = ({ notice }) => {
             <FilePenLine className="text-blue-700" />
           </Button>
         </DialogTrigger>
-        <DialogContent>
-          <DialogHeader className="flex flex-col gap-2">
-            <DialogTitle>Edit Confirmation</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to edit this notice?
-            </DialogDescription>
-            <Button
-              className="mt-4 bg-blue-600 text-white hover:bg-blue-800"
-              onClick={handleEdit}
-            >
-              Confirm Edit
-            </Button>
-          </DialogHeader>
+        {/* <DialogContent> */}
+         
+        <DialogContent className="max-w-md w-full">
+        <DialogTitle className="text-center">Edit Notice</DialogTitle>
+                                    <DialogHeader>
+                                        <DialogDescription>
+                                            Update the details for this notice.
+                                        </DialogDescription>
+                                    </DialogHeader>
+
+                                    <Input
+                                        placeholder="Title"
+                                        value={title}
+                                        onChange={(e) =>
+                                            setTitle(e.target.value)
+                                        }
+                                    />
+
+                                    <Textarea
+                                        placeholder="Description"
+                                        value={description}
+                                        onChange={(e) =>
+                                            setDescription(e.target.value)
+                                        }
+                                    />
+
+                                    <Input
+                                        type="file"
+                                        accept="image/*,video/*,application/pdf"
+                                        onChange={(e) =>
+                                            setFile(e.target.files?.[0] || null)
+                                        }
+                                    />
+
+                                    {notice.media &&
+                                        notice.media.length > 0 && (
+                                            <span className="text-sm text-red-400">
+                                                * Media is exist but can't
+                                                preview here
+                                            </span>
+                                        )}
+
+                                    <Button
+                                        onClick={updateNotice}
+                                        className="w-full mt-4"
+                                        disabled={loading}
+                                    >
+                                       {!loading?<> Submit</>:
+                                        <Loader className="animate-spin text-blue-700" />}
+                                    </Button>
+                                {/* </DialogContent> */}
         </DialogContent>
       </Dialog>
     </div>
@@ -96,8 +166,8 @@ const MobileNotice: React.FC<Props> = ({ notice }) => {
           </Button>
         </DialogTrigger>
         <DialogContent>
+        <DialogTitle className="text-center">Are you absolutely sure?</DialogTitle>
           <DialogHeader className="flex flex-col gap-2">
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
             <DialogDescription>
               This action cannot be undone. This will permanently delete this notice.
             </DialogDescription>
@@ -111,38 +181,58 @@ const MobileNotice: React.FC<Props> = ({ notice }) => {
         </DialogContent>
       </Dialog>
     </div>
-  </AuthenticateComponent>
+  </AuthenticateComponent >
 
   {notice.media.length > 0 && (
-    <div className="flex-1">
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button className="w-full" variant="outline">
-            <Eye className="h-4 w-4" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-sm h-[90vh] p-0 overflow-hidden">
-          <DialogHeader className="p-4 border-b">
-            <DialogTitle className="text-base">Preview</DialogTitle>
-          </DialogHeader>
-          <div className="w-full h-full flex items-center justify-center bg-muted p-2">
-            {isPDF(notice.media[0].url) ? (
-              <PDFPreview
-                pdfUrl={notice.media[0].url}
-                fileName={notice.media[0].public_id}
-              />
-            ) : (
-              <img
-                src={notice.media[0].url}
-                alt="Notice Media"
-                className="max-w-full max-h-[70vh] object-contain rounded"
-              />
-            )}
+  <div className="flex-1">
+    <Button className="w-full" variant="outline" onClick={() => setView(true)}>
+      <Eye className="h-4 w-4" />
+    </Button>
+
+    <AnimatePresence>
+      {view && (
+        <motion.div
+          key="media-preview"
+          initial={{ opacity: 0 ,y:120}}
+          animate={{ opacity: 1 ,y:0}}
+          exit={{ opacity: 0 }}
+          transition={{ type: "spring", damping: 30 ,duration:0.3}}
+          className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center"
+        >
+          <div className="relative w-full h-full max-w-sm mx-auto bg-white dark:bg-zinc-900 rounded-lg overflow-hidden shadow-lg">
+            <div className="flex justify-between items-center p-4 border-b bg-muted">
+              <h3 className="text-base font-semibold">Media Preview</h3>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setView(false)}
+                className="h-8 w-8"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="h-full w-full flex items-center justify-center bg-muted px-2 py-4">
+              {isPDF(notice.media[0].url) ? (
+                <PDFPreview
+                  pdfUrl={notice.media[0].url}
+                  fileName={notice.media[0].public_id}
+                />
+              ) : (
+                <img
+                  src={notice.media[0].url}
+                  alt="Notice Media"
+                  className="max-w-full max-h-[80vh] object-contain rounded"
+                />
+              )}
+            </div>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>
-  )}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+)}
+
 </div>
 
       </div>

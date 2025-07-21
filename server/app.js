@@ -34,7 +34,7 @@ server.use('/api/v1/routines', routineRouter)
 // server.use('/api/v1/mail', mailRouter)
 
 server.get("/", (req, res) => {
-    res.send("application is run ")
+    res.send("application is running ")
     // .json({
     //     message: "all ok "
     // })

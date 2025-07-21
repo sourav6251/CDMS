@@ -32,42 +32,52 @@ class NoticeboardService {
 
     async updateNotice(id, data) {
         const { title, description, bufferFile, originalName } = data;
-        let media = [];
 
         try {
             // Find the existing notice
             const existingNotice = await Noticeboard.findById(id);
             console.log("existingNotice=>>>>", existingNotice);
+            console.log("originalName=>>>>", originalName);
 
             if (!existingNotice) {
                 throw new Error("Notice not found");
             }
+            let media;
+
             if (bufferFile != null) {
                 const { url, publicId } = await imagekitService.uploadImage(
                     bufferFile,
                     originalName
                 );
-                media.push({
+                media = [{
                     url,
                     public_id: publicId,
-                });
+                }];
+            } else if (existingNotice.media && existingNotice.media.length > 0) {
+                media = existingNotice.media;
             } else {
-                media.push({
-                    url: existingNotice.url,
-                    public_id: existingNotice.public_id,
-                });
+                media = null;
             }
             console.log("existingNotice.media.public_id");
-            console.log(existingNotice.media.public_id);
-            if (existingNotice.media[0].public_id) {
-                console.log("existingNotice.media.public_id");
-                console.log(existingNotice.media.public_id);
+            // console.log(existingNotice.media.public_id);
+            // if (existingNotice.media[0].public_id) {
+            //     console.log("existingNotice.media.public_id");
+            //     console.log(existingNotice.media.public_id);
 
-                const respponse1 = imagekitService.deleteImage(
+            //     const respponse1 = imagekitService.deleteImage(
+            //         existingNotice.media[0].public_id
+            //     );
+            //     console.log("response=>>>", respponse1);
+            // }
+            if (Array.isArray(existingNotice.media) && existingNotice.media.length > 0 && existingNotice.media[0].public_id) {
+                console.log("existingNotice.media.public_id", existingNotice.media[0].public_id);
+            
+                const response1 = await imagekitService.deleteImage(
                     existingNotice.media[0].public_id
                 );
-                console.log("response=>>>", respponse1);
+                console.log("response=>>>", response1);
             }
+            
             // Update notice in database
             const updatedNotice = await Noticeboard.findByIdAndUpdate(
                 id,

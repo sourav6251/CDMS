@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,7 +85,7 @@ const initialData: CertificateFormData = {
 const CertificateGenerator: React.FC = () => {
     const [formType, setFormType] = useState<FormType>("external");
     const [formData, setFormData] = useState<CertificateFormData>(initialData);
-    const role=useAppSelector((state)=>state.user.role)
+    const role = useAppSelector((state) => state.user.role);
 
     const handleChange = (field: keyof CertificateFormData, value: string) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
@@ -158,6 +158,14 @@ const Form: React.FC<FormProps> = ({
     type,
     // role
 }) => {
+    const getAllExternalUsers = async () => {
+        try {
+            const response = await apiStore.getAllExternalUsers();
+        } catch (error) {}
+    };
+    useEffect(() => {
+        getAllExternalUsers();
+    }, []);
     const isOddSemester = (sem: string) => {
         const num = parseInt(sem);
         return !isNaN(num) && num % 2 !== 0;
@@ -177,15 +185,18 @@ const Form: React.FC<FormProps> = ({
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <AuthenticateComponent roles={["hod"]}>
-                        <div className="space-y-1">
-                            <Label>Memo No</Label>
-                            <Input
-                                value={formData.memoNumber}
-                                onChange={(e) =>
-                                    handleChange("memoNumber", e.target.value)
-                                }
-                            />
-                        </div>
+                            <div className="space-y-1">
+                                <Label>Memo No</Label>
+                                <Input
+                                    value={formData.memoNumber}
+                                    onChange={(e) =>
+                                        handleChange(
+                                            "memoNumber",
+                                            e.target.value
+                                        )
+                                    }
+                                />
+                            </div>
                         </AuthenticateComponent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div className="space-y-1">

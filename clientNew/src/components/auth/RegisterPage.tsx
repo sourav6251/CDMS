@@ -87,6 +87,7 @@ const RegisterPage = () => {
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            // toast.success("Enter into handleLoginSubmit")
             const response = await apiStore.login(loginData);
             console.log("response=>", response);
 
@@ -106,7 +107,9 @@ const RegisterPage = () => {
             dispatch(login(loginUserData));
             navigate("/syllabus")
             toast.success("Login successfully");
-        } catch (error) {}
+        } catch (error) {
+            // toast.success("Enter into handleLoginSubmit3")
+        }
         // toast.success("Logged in successfully");
         // console.log("Login:", loginData);
     };

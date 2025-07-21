@@ -16,7 +16,7 @@ class UserService {
             throw new Error("User already exist");
         }
         try {
-          return  await Users.create({ name, email, password, role });
+            return await Users.create({ name, email, password, role });
         } catch (error) {
             throw new Error(error.message);
         }
@@ -44,7 +44,7 @@ class UserService {
     async generateOtp(email) {
         const otp = genarate6DigitOtp();
         try {
-            let user = await Users.findOne({email});
+            let user = await Users.findOne({ email });
             user.otp = otp;
             user.otpExpiary = Date.now() + 5 * 60 * 1000; // OTP valid for 5 minutes
             await user.save();
@@ -52,7 +52,7 @@ class UserService {
                 name: user.name,
                 otp,
             };
-           await mailService.sendMailForOTP(user.email, data);
+            await mailService.sendMailForOTP(user.email, data);
             return "success";
         } catch (error) {
             throw new Error("User not found");
@@ -113,8 +113,10 @@ class UserService {
 
     async getAllUser() {
         try {
+            const normalUsers = await NormalUser.find().select("name email ");
             const users = await Users.find().select("name email role");
-            return users;
+            const combinedUsers = [...normalUsers, ...users];
+            return combinedUsers;
         } catch (error) {
             throw new Error("Failed to fetch users");
         }
@@ -130,7 +132,7 @@ class UserService {
                 name: response.name,
                 email: response.email,
             };
-            mailService.sendMailForDelete(response.email,data);
+            mailService.sendMailForDelete(response.email, data);
         } catch (error) {
             throw new Error(error.message);
         }
@@ -214,5 +216,25 @@ class UserService {
             throw new Error(error.message);
         }
     }
+ getAllExternalUsers = async () => {
+        try {
+          // Fetch normal users (name and email)
+          const normalUsers = await NormalUser.find({}, { name: 1, email: 1, _id: 0 });
+      
+          // Fetch users where role is 'external' (name and email)
+          const externalUsers = await Users.find(
+            { role: "external" },
+            { name: 1, email: 1, _id: 0 }
+          );
+      
+          // Combine both (optional)
+          const combinedUsers = [...normalUsers, ...externalUsers];
+      
+          return combinedUsers;
+        } catch (error) {
+          console.error("Error fetching users:", error);
+          throw error;
+        }
+      };
 }
 export default new UserService();

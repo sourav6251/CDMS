@@ -27,6 +27,6 @@ router
     .delete("/",isAuthenticate,userController.deleteUser)
     .delete("/hoddelete/:userID",validate(userValidation.approve),isAuthenticate,authorizeRoles("hod"),userController.hoddelete)
     .put("/approve/:userID",validate(userValidation.approve),isAuthenticate,authorizeRoles("hod"),userController.approveByHOD)
-
+    .get("/external",isAuthenticate,authorizeRoles("hod"),userController.getAllExternalUsers)
 
 export const userRouter = router;

@@ -23,7 +23,7 @@ router
         isAuthenticate,
         meetingController.showMeeting
     )
-    .get("/notify:meetingId",validate(meetingValidation.notify),isAuthenticate,authorizeRoles("hod"),meetingController.notifyMeeting)
+    .get("/notify/:meetingId",validate(meetingValidation.notify),isAuthenticate,authorizeRoles("hod"),meetingController.notifyMeeting)
 
     // .get("/:userid", meetingController.showMeeting)
     .patch(

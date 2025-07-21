@@ -9,8 +9,13 @@ class SyllabusController {
             const { semester, paperName, paperCode } = req.body;
             const media = req.file;
             const user = req.user._id;
-            const bufferFile = req.file.buffer;
-            const originalName = req.file.originalname;
+            let bufferFile;
+                let originalName;
+            if (req.file && req.file.buffer && req.file.originalname) {
+                 bufferFile = req.file.buffer;
+                 originalName = req.file.originalname;
+                // proceed with bufferFile and originalName
+            }
             console.log("req.body => ", req.body);
             if (!req.file) {
                 return sendResponse(res, {
@@ -119,7 +124,7 @@ class SyllabusController {
             );
             let status = HTTP_STATUS.OK;
             if (!syllabus || syllabus.length === 0) {
-                status = HTTP_STATUS.NO_CONTENT;
+                status = HTTP_STATUS.OK;
             }
             return sendResponse(res, {
                 message: RESPONSE_MESSAGES.SYLLABUS_FETCHED,

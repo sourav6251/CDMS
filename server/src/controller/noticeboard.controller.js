@@ -7,6 +7,7 @@ class NoticeboardController {
     async createNotice(req, res) {
         const { title, description } = req.body;
         console.log("req.body=>", title, description);
+        // console.log("req.originalname=>",   req.file.originalname);
 
         const { _id } = req.user;
         let bufferFile = null;
@@ -46,6 +47,8 @@ class NoticeboardController {
     }
 
     async showNotices(req, res) {
+        console.log("Enter into showNotices ");
+        
         try {
             const notices = await noticeboardService.showNotices();
             let status = HTTP_STATUS.OK;

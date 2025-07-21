@@ -129,6 +129,8 @@ class UserController {
     }
 
     async loginUser(req, res) {
+        console.log("Enterinto login");
+        
         try {
             const { email, password } = req.body;
             const user = await userService.loginUser({ email, password });
@@ -326,6 +328,22 @@ class UserController {
         const id = req.params.userID;
         try {
             const response = await userService.approveByHOD(id);
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Status update successfully",
+            });
+        } catch (error) {
+            sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                success: false,
+                error: error.message,
+            });
+        }
+    }
+    async getAllExternalUsers(req, res) {
+        try {
+            const response = await userService.getAllExternalUsers();
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
                 success: true,
