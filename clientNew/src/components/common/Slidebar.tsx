@@ -47,7 +47,7 @@ const Slidebar = ({ minimize, setMinimize }: SlidebarProps) => {
                 onClick={() => navigate(item.path)}
                 className={`flex items-center px-2 py-2 cursor-pointer transition-all rounded-md relative
                   ${minimize ? "justify-start gap-3 mx-3" : "justify-center ml-1"}
-                  ${isActive ? "bg-slate-100 text-primary" : "hover:bg-slate-200"}
+                  ${isActive ? "bg-slate-100 text-primary dark:bg-[#3b3530]" : "hover:bg-slate-200 hover:dark:bg-[#3b3530]"}
                 `}
             >
                 {isActive && (

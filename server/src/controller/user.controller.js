@@ -84,7 +84,10 @@ class UserController {
     async generateOtp(req, res) {
         try {
             const {email} = req.body;
-            const otp = await userService.generateOtp(email);
+            const id = req.user?.id || null;
+            console.log("req.user?.id=>",id);
+            
+            const otp = await userService.generateOtp(email,id);
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
                 success: true,
@@ -103,7 +106,9 @@ class UserController {
     async verifyOtp(req, res) {
         try {
             const { otp, email } = req.body;
-            await userService.verifyOtp({ otp, email });
+
+            const id = req.user?.id || null;
+            await userService.verifyOtp({ otp, email,id });
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
                 success: true,
@@ -236,10 +241,14 @@ class UserController {
             const { id } = req.user;
             let bufferFile = null;
             let originalName = null;
-            if (req.file.buffer) {
+            if (req.file) {
                 bufferFile = req.file.buffer;
                 originalName = req.file.originalname;
-            }
+              }
+          
+
+            console.log("Email=>",email);
+            
             await userService.updateUser({
                 id,
                 name,
@@ -285,9 +294,13 @@ class UserController {
     async updatePassword(req, res) {
         try {
             const { email, newPassword } = req.body;
+            // const id=
+            const id = req.user?.id || null;
+console.log("newPassword=>",newPassword);
 
             const response = await userService.updatePassword({
                 email,
+                id,
                 newPassword,
             });
             sendResponse(res, {

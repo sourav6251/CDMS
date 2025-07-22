@@ -132,7 +132,7 @@ class APIStore {
 
     verifyOTP = async (otpData: otpData) => {
         try {
-            await axiosInstance.post("/user/verify_otp", otpData);
+          return  await axiosInstance.post("/user/verify_otp", otpData);
             // toast.error("OTP verify sucessfully");
         } catch (error: any) {
             this.handleError(error);
@@ -205,7 +205,7 @@ class APIStore {
             toast.success("Featch getalluser successfully");
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -217,7 +217,7 @@ class APIStore {
             toast.success("Featch getalluser successfully");
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -234,7 +234,7 @@ class APIStore {
             toast.success("Featch getalluser successfully");
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -243,10 +243,9 @@ class APIStore {
         try {
             const response = await axiosInstance.get("/meeting");
             console.log("response=>", response);
-            toast.success("Featch getalluser successfully");
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -260,7 +259,7 @@ class APIStore {
             toast.success("Featch getalluser successfully");
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -274,7 +273,7 @@ class APIStore {
             toast.success("Successfully notify");
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -284,7 +283,7 @@ class APIStore {
             const response = await axiosInstance.get("/noticeboard");
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -304,7 +303,7 @@ class APIStore {
             toast.success("Featch getalluser successfully");
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -315,7 +314,7 @@ class APIStore {
             await axiosInstance.delete(`/noticeboard/${noticeId}`);
             toast.success("Notice delete successfully");
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -334,7 +333,7 @@ class APIStore {
             await axiosInstance.patch(`/noticeboard/${noticeId}`,form);
             toast.success("Notice updated successfully");
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -348,7 +347,7 @@ class APIStore {
             });
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -362,10 +361,11 @@ class APIStore {
             
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
+
     updateSyllabus = async (sylabusID:string,payload:any) => {
        
         try {
@@ -375,7 +375,7 @@ class APIStore {
             
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
@@ -389,12 +389,91 @@ class APIStore {
             
             return response;
         } catch (error: any) {
-            this.handleError;
+            this.handleError(error);
             throw new Error(error);
         }
     };
 
+    addRoutine=async(payload:any)=>{
+        try {
+          const response=  await axiosInstance.post("/routines",payload)
+          console.log("response=>",response);
+          
+        } catch (error:any) {
+            
+        }
 
+    }
+
+    showRoutine = async (semID:string) => {
+        try {
+           
+          const response=  await axiosInstance.get(`/routines/${semID}`)
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+    
+    fetchUser = async () => {
+        try {
+           
+          const response=  await axiosInstance.get(`/user/getuser`)
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };    
+    updateUser = async (payload:any) => {
+        console.log("payload=>",payload.email);
+        
+        const form=new FormData();
+        form.append("email",payload.email)
+        form.append("name",payload.name)
+        if (payload.photo) {
+            form.append("photo",payload.photo)
+        }
+        try {
+           
+          const response=  await axiosInstance.put(`/user`,form)
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+   
+    generateOTP=async()=>{
+        console.log("Enter into generateOTP");
+        
+        try {
+          const response=  await axiosInstance.post("/user/generate_otp")
+        } catch (error:any) {
+            this.handleError(error)
+        }
+    }
+
+
+    verifyotp = async (otpData: string) => {
+        try {
+           await axiosInstance.post("/user/verifyotp", {otp:otpData});
+            toast.success("OTP verify sucessfully");
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error.error.status);
+        }
+    };
+    updatePassword = async (password: string) => {
+        try {
+           await axiosInstance.put("/user/updatepassword", {newPassword:password});
+            toast.success("Password update sucessfully");
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error.error.status);
+        }
+    };
 }
 export default new APIStore();
   

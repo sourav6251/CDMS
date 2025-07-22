@@ -10,11 +10,9 @@ import { noticeboardRouter } from "./src/routes/noticeboard.routes.js"
 import { userRouter } from "./src/routes/user.routes.js"
 import { routineRouter } from "./src/routes/routin.routes.js"
 import mailConfiguration from "./src/config/mail.configuration.js"
-// import { mailRouter } from "./src/routes/mail.route.js"
-// import "./src/utils/sendRoutineMails.js";
-
-// import { swaggerSpec } from "./src/config/swagger.config.js";
-
+import { Users } from "./src/model/user.model.js"
+import { NormalUser } from "./src/model/normaluser.model.js"
+import { Routines } from "./src/model/routine.model.js"
 
 const server = express()
 

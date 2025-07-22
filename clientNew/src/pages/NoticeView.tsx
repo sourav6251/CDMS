@@ -5,7 +5,7 @@ import MobileNotice from "@/components/noticeboard/MobileNotice";
 import PcNotice from "@/components/noticeboard/PcNotice";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/store/reduxHooks";
-import { Plus } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +26,7 @@ const NoticeView = () => {
   const userRole: string = useAppSelector((state) => state.user.role);
 const [notices,setNotices]=useState([]);
 const [isLoading,setIsLoading]=useState(false)
+const [creating,setCreating]=useState(false)
   const [formData, setFormData] = useState<NoticeFormFields>({
     title: "",
     description: "",
@@ -48,6 +49,7 @@ const [isLoading,setIsLoading]=useState(false)
 
   const handleSubmit = async () => {
   
+    setCreating(true)
     try {
       await apiStore.addNotice(formData); 
       fetchAllNotice();
@@ -55,6 +57,8 @@ const [isLoading,setIsLoading]=useState(false)
       setFormData({ title: "", description: "", media: null });
     } catch (err) {
       console.error("Failed to add notice", err);
+    }finally{
+      setCreating(false)
     }
   };
   
@@ -110,15 +114,16 @@ const [isLoading,setIsLoading]=useState(false)
          }
        />
    
-       <Button onClick={handleSubmit} className="w-full mt-4">
-         Submit
+       <Button onClick={handleSubmit} className="w-full mt-4"  disabled={creating}>
+        {creating?<Loader className="animate-spin text-blue-700" />:"Submit"}
+         
        </Button>
      </DialogContent>
    </Dialog>
    
       )}
 {isLoading ?  <div className="flex items-center justify-center h-[50vh]">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-800 border-solid"></div>
         </div>:<>   {isMobile
         ? notices.map((notice:any) => (
             <MobileNotice key={notice._id} notice={notice}  fetchNotice={fetchAllNotice}/>

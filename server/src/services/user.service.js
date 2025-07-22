@@ -41,10 +41,17 @@ class UserService {
     }
 
     //todo: add email
-    async generateOtp(email) {
+    async generateOtp(email,id) {
         const otp = genarate6DigitOtp();
-        try {
-            let user = await Users.findOne({ email });
+        try {let user;
+            if (email) {
+                
+             user = await Users.findOne({ email });
+            }
+            else {
+
+             user = await Users.findById(id);
+            }
             user.otp = otp;
             user.otpExpiary = Date.now() + 5 * 60 * 1000; // OTP valid for 5 minutes
             await user.save();
@@ -59,9 +66,15 @@ class UserService {
         }
     }
 
-    async verifyOtp({ otp, email }) {
+    async verifyOtp({ otp, email ,id}) {
         try {
-            let user = await Users.findOne({ email }).select("+otp ");
+            let user;
+            if(email){
+                user = await Users.findOne({ email }).select("+otp ");
+            }else{
+
+                user = await Users.findById(id).select("+otp ");
+            }
             if (!user) {
                 throw new Error("User not found");
             }
@@ -185,15 +198,23 @@ class UserService {
         }
     }
 
-    async updatePassword({ email, newPassword }) {
-        try {
-            let user = await Users.findOne({ email }).select("+password");
+    async updatePassword({ email,id, newPassword }) {
+        try {  let user ;
+            if (email) {
+                user = await Users.findOne({ email }).select("+password");   
+            }
+            else{
+
+                user = await Users.findById(id).select("+password");  
+            }
 
             if (!user) {
                 throw new Error("User not found");
             }
 
             user.password = newPassword; // This will trigger the `pre('save')` middleware to hash
+            console.log("user=>",user);
+            
             await user.save();
             return "Password updated successfully";
         } catch (error) {

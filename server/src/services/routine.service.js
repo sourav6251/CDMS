@@ -73,19 +73,62 @@ class RoutineService {
         }
     }
 
-    async showRoutine(semester) {
-        try {
-            const routines = await Routines.find({ semester }).populate({
-                path: "schedules.timeSlots.professor",
-                select: "name email",
-                strictPopulate: false,
-            });
-            return routines;
-        } catch (error) {
-            throw new Error("INTERNAL ERROR");
+    // async showRoutine(semester) {
+    //     try {
+    //         const routines = await Routines.find({ semester }).populate({
+    //             path: "schedules.timeSlots.professor",
+    //             select: "name email",
+    //             strictPopulate: false,
+    //         });
+    //         return routines;
+    //     } catch (error) {
+    //         throw new Error("INTERNAL ERROR");
+    //     }
+    // }
+   
+    async  showRoutine(semester) {
+      try {
+        const routines = await Routines.find({ semester }).lean();
+    
+        for (const routine of routines) {
+          for (const schedule of routine.schedules) {
+            for (const timeSlot of schedule.timeSlots) {
+              const profId = timeSlot.professor;
+              const profModel = timeSlot.professorModel;
+    
+              let professorData = null;
+    
+              if (profModel === "user") {
+                professorData = await Users.findById(profId)
+                  .select("name email")
+                  .lean();
+              } else if (profModel === "normaluser") {
+                professorData = await NormalUser.findById(profId)
+                  .select("name email")
+                  .lean();
+              }
+    
+              if (professorData) {
+                timeSlot.professor = professorData;
+              } else {
+                timeSlot.professor = { name: "Unknown", email: "" };
+              }
+    
+              // Optionally remove professorModel now
+              delete timeSlot.professorModel;
+            }
+          }
         }
+    
+        return routines;
+      } catch (error) {
+        console.error("Routine fetch error:", error);
+        throw new Error("INTERNAL ERROR");
+      }
     }
-
+    
+      
+    
     async updateRoutine(id, data) {
         return await Routines.findByIdAndUpdate(id, data, {
             new: true,

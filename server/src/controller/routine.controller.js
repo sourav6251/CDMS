@@ -83,11 +83,11 @@ class RoutineController {
             const { semester } = req.params;
 
             const routines = await routineService.showRoutine(semester);
-            if (!routines || routines.length === 0) {
-                return sendResponse(res, {
-                    status: HTTP_STATUS.NO_CONTENT,
-                });
-            }
+            // if (!routines || routines.length === 0) {
+            //     return sendResponse(res, {
+            //         status: HTTP_STATUS.NO_CONTENT,
+            //     });
+            // }
 
             return sendResponse(res, {
                 status: HTTP_STATUS.OK,
