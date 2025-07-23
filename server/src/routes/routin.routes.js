@@ -7,7 +7,7 @@ import routineValidation from "../validations/routine.validation.js";
 // import { validate } from "../middlewares/validate.middleware.js";
 
 const router = express.Router();
-
+ 
 router
     .post(
         "/",
@@ -23,6 +23,7 @@ router
     //     isAuthenticate,
     //     routineController.updateRoutine
     // )
+    .get("/",isAuthenticate, authorizeRoles("hod","faculty"),routineController.classRoutine)
     .delete(
         "/",
         validate(routineValidation.delete),

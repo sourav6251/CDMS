@@ -1,19 +1,20 @@
-import DesktopDashboard from "@/components/dashboard/DesktopDashboard";
-import MobileDashboard from "@/components/dashboard/MobileDashboard";
-import { IsMobile } from "@/components/hook/IsMobile";
+import ExternalDashboard from "@/components/dashboard/ExternalDashboard";
+import FacultyDashboard from "@/components/dashboard/FacultyDashboard";
+import HODDashboard from "@/components/dashboard/HODDashboard";
+import { useAppSelector } from "@/store/reduxHooks";
 
 const DashboardView = () => {
-    const isMobile = IsMobile("(max-width: 768px)");
-    return isMobile ? (
-        <div className="h-full w-full flex justify-center items-center">
-            <MobileDashboard />
-        </div>
-    ) : (
-        <div className="h-full w-full flex justify-center items-center">
-            <DesktopDashboard />
-        </div>
-    );
+
+    const role=useAppSelector((state)=>state.user.role)
+  return (
+<div className="w-full h-full">
+      {role === "hod" && <HODDashboard />}
+      {role === "faculty" && <FacultyDashboard />}
+      {role === "external" && <ExternalDashboard />}
+      <div className="px-6 py-4">hello</div>
+    </div>
+
+  )
 };
 
 export default DashboardView;
-//todo:Dashboard

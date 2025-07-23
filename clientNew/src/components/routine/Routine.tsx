@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Loader, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import apiStore from "@/api/apiStore";
+import AuthenticateComponent from "@/utils/AuthenticateComponent";
 
 interface Professor {
   _id: string;
@@ -16,6 +20,7 @@ interface TimeSlot {
   _id: string;
   paperCode: string;
   paperName: string;
+  roomNo:string;
   startTime: string;
   endTime: string;
   professorModel: "user" | "normaluser";
@@ -30,13 +35,16 @@ interface Schedule {
 interface Routine {
   _id: string;
   schedules: Schedule[];
+  semester: string;
 }
 
 interface Props {
   routines: Routine[];
+  
+  fetchRoutine: (sem: string) => void;
 }
 
-const Routine: React.FC<Props> = ({ routines }) => {
+const Routine: React.FC<Props> = ({ routines,fetchRoutine }) => {
   const days = [
     "Monday",
     "Tuesday",
@@ -55,32 +63,43 @@ const Routine: React.FC<Props> = ({ routines }) => {
       minute: "2-digit",
     });
   };
-
+const [deleting,setDeleting]=useState(false)
   const selectedRoutine = routines[0];
 
   if (!selectedRoutine) {
-    return <p className="text-center text-gray-500">No routine found</p>;
+    return <p className="text-center">No routine found</p>;
+  }
+  const onDelete=async(routineId:string, timeSlotId:string)=>{
+    setDeleting(true)
+    console.log("onDelete=>",routineId,"  ",timeSlotId);
+    try {
+      await apiStore.deleteRoutine(routineId,timeSlotId)
+      fetchRoutine(selectedRoutine.semester)
+    } catch (error:any) {
+      
+    }finally{
+      setDeleting(false)
+    }
+    
   }
 
   return (
     <div className="w-full mt-6 px-2 sm:px-4">
       <Tabs defaultValue="monday" className="w-full">
         {/* Tabs List */}
-        {/* <TabsList className="w-full flex flex-wrap gap-2 justify-center sm:justify-start overflow-x-auto"> */}
         <div className="overflow-x-auto w-full scrollbar-thin scrollbar-thumb-gray-400">
-            <TabsList className="inline-flex gap-2 min-w-max px-2 w-full">
-                {days.map((day) => (
-                <TabsTrigger
-                    key={day}
-                    value={day.toLowerCase()}
-                    className="min-w-[90px] text-sm sm:text-base"
-                >
-                    {day}
-                </TabsTrigger>
-                ))}
-            </TabsList>
+          <TabsList className="inline-flex gap-2 min-w-max px-2 w-full">
+            {days.map((day) => (
+              <TabsTrigger
+                key={day}
+                value={day.toLowerCase()}
+                className="min-w-[90px] text-sm sm:text-base"
+              >
+                {day}
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
-
 
         {/* Tabs Content */}
         {days.map((day) => {
@@ -99,15 +118,27 @@ const Routine: React.FC<Props> = ({ routines }) => {
                   {schedule?.timeSlots.map((slot) => (
                     <div
                       key={slot._id}
-                      className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 sm:p-5 transition hover:shadow-md"
+                      className="rounded-xl border shadow-sm p-4 sm:p-5 transition hover:shadow-md relative"
                     >
+                      <AuthenticateComponent roles={["hod"]}>
+                      {/* 🗑️ Delete Button */}
+                      {deleting?<Loader className="animate-spin" />: <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 hover:text-red-500"
+                        onClick={() => onDelete(selectedRoutine._id,slot._id)}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </Button>}
+                     
+                      </AuthenticateComponent>
                       {/* Header Section */}
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                         <div className="space-y-1">
-                          <h3 className="text-base sm:text-lg font-semibold text-gray-800">
-                            {slot.paperCode}: {slot.paperName}
+                          <h3 className="text-base sm:text-lg font-semibold">
+                            {slot.paperCode}: {slot.paperName} : {slot.roomNo} 
                           </h3>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm">
                             <span className="font-medium">Professor:</span>{" "}
                             {typeof slot.professor === "object" &&
                             slot.professor !== null
@@ -117,17 +148,13 @@ const Routine: React.FC<Props> = ({ routines }) => {
                         </div>
 
                         {/* Time Info */}
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 text-sm text-gray-600">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 text-sm">
                           <div>
-                            <span className="font-medium text-gray-800">
-                              Start:
-                            </span>{" "}
+                            <span className="font-medium">Start:</span>{" "}
                             {formatTime(slot.startTime)}
                           </div>
                           <div>
-                            <span className="font-medium text-gray-800">
-                              End:
-                            </span>{" "}
+                            <span className="font-medium">End:</span>{" "}
                             {formatTime(slot.endTime)}
                           </div>
                         </div>
@@ -136,9 +163,7 @@ const Routine: React.FC<Props> = ({ routines }) => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center">
-                  No routine for {day}
-                </p>
+                <p className="text-center">No routine for {day}</p>
               )}
             </TabsContent>
           );

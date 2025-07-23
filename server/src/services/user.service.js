@@ -123,18 +123,30 @@ class UserService {
             throw new Error("User not found");
         }
     }
-
     async getAllUser() {
         try {
-            const normalUsers = await NormalUser.find().select("name email ");
-            const users = await Users.find().select("name email role");
-            const combinedUsers = [...normalUsers, ...users];
+            const normalUsers = await NormalUser.find().select("name email").lean();
+            const users = await Users.find().select("name email role").lean();
+    
+            // Tag each user with model name
+            const taggedNormalUsers = normalUsers.map((user) => ({
+                ...user,
+                model: "normaluser",
+            }));
+    
+            const taggedUsers = users.map((user) => ({
+                ...user,
+                model: "user",
+            }));
+    
+            const combinedUsers = [...taggedNormalUsers, ...taggedUsers];
             return combinedUsers;
         } catch (error) {
+            console.error("getAllUser error:", error);
             throw new Error("Failed to fetch users");
         }
     }
-
+    
     async deleteUser(id) {
         try {
             const response = await Users.findByIdAndDelete(id);

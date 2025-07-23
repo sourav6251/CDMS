@@ -425,7 +425,8 @@ class APIStore {
             this.handleError(error);
             throw new Error(error);
         }
-    };    
+    };   
+
     updateUser = async (payload:any) => {
         console.log("payload=>",payload.email);
         
@@ -455,7 +456,6 @@ class APIStore {
         }
     }
 
-
     verifyotp = async (otpData: string) => {
         try {
            await axiosInstance.post("/user/verifyotp", {otp:otpData});
@@ -465,6 +465,7 @@ class APIStore {
             throw new Error(error.error.status);
         }
     };
+
     updatePassword = async (password: string) => {
         try {
            await axiosInstance.put("/user/updatepassword", {newPassword:password});
@@ -474,6 +475,31 @@ class APIStore {
             throw new Error(error.error.status);
         }
     };
+
+    deleteRoutine=async(routineId:string, timeSlotId:string)=>{
+        try {
+            await axiosInstance.delete("/routines", {
+                params: {
+                  routineId: routineId,
+                  timeSlotId: timeSlotId,
+                },})
+        } catch (error:any) {
+            this.handleError(error)
+            
+        }
+    }   
+    
+    getUserScheduleForToday=async()=>{
+        try {
+            return await axiosInstance.get("/routines")
+        //   console.log("routine=>",routine);
+        //   return routine;
+          
+        } catch (error:any) {
+            this.handleError(error)
+            
+        }
+    }
 }
 export default new APIStore();
   

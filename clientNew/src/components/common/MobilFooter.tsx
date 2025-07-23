@@ -1,27 +1,36 @@
-
 import {
   Calendar,
   ClipboardList,
   FileBadge,
   HouseIcon,
   LibraryBig,
+  Settings,
   Users,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAppSelector } from "@/store/reduxHooks";
 
 const MobilFooter = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const isLogin = useAppSelector((state) => state.user.isLogin);
 
-  const slideItems = [
-    { icon: HouseIcon, path: "/" },
-    { icon: FileBadge, path: "/certificate" },
-    { icon: Users, path: "/meeting" },
-    { icon: ClipboardList, path: "/notice" },
-    { icon: LibraryBig, path: "/syllabus" },
-    { icon: Calendar, path: "/routine" },
-  ];
+  const slideItems = isLogin
+    ? [
+        { icon: HouseIcon, path: "/" },
+        { icon: FileBadge, path: "/certificate" },
+        { icon: Users, path: "/meeting" },
+        { icon: ClipboardList, path: "/notice" },
+        { icon: LibraryBig, path: "/syllabus" },
+        { icon: Calendar, path: "/routine" },
+        { icon: Settings, path: "/setting" },
+      ]
+    : [
+        { icon: ClipboardList, path: "/notice" },
+        { icon: LibraryBig, path: "/syllabus" },
+        { icon: Calendar, path: "/routine" },
+      ];
 
   return (
     <div className="fixed bottom-0 left-0 w-full h-14 bg-sidebarBg backdrop-blur-sm shadow-md flex items-center justify-around z-50 border-t">

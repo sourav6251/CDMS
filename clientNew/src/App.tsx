@@ -13,6 +13,7 @@ import AuthenticateRole from "./utils/AuthenticateRole";
 import { Toaster } from "sonner";
 import Register from "./components/auth/RegisterPage";
 import LoginView from "./pages/LoginView";
+import RequireLoginRoute from "./utils/RequireLoginRoute";
 
 function App() {
     return (
@@ -21,32 +22,34 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Layout />}>
-                        <Route
-                            element={
-                                <AuthenticateRole
-                                    roles={[
-                                        "admin",
-                                        "hod",
-                                        "external",
-                                        "faculty",
-                                    ]}
+                        {/* ✅ Protected routes (requires login) */}
+                        <Route element={<RequireLoginRoute />}>
+                            <Route
+                                element={
+                                    <AuthenticateRole
+                                        roles={["admin", "hod", "external"]}
+                                    />
+                                }
+                            >
+                                <Route
+                                    path="certificate"
+                                    element={<CertificateView />}
                                 />
-                            }
-                        >
+                            </Route>
                             <Route index element={<DashboardView />} />
                             <Route path="meeting" element={<MeetingView />} />
+
+                            <Route path="member" element={<MemberView />} />
+                            <Route path="setting" element={<SettingView />} />
                         </Route>
+
+                        {/* ✅ Public routes */}
+                        <Route path="notice" element={<NoticeView />} />
+                        <Route path="syllabus" element={<SyllabusView />} />
+                        <Route path="routine" element={<RoutineView />} />
+                        <Route path="login" element={<LoginView />} />
+                        <Route path="register" element={<Register />} />
                         <Route path="/*" element={<NotFound />} />
-                        <Route
-                            path="/certificate"
-                            element={<CertificateView />}
-                        />
-                        <Route path="/member" element={<MemberView />} />
-                        <Route path="/notice" element={<NoticeView />} />
-                        <Route path="/routine" element={<RoutineView />} />
-                        <Route path="/setting" element={<SettingView />} />
-                        <Route path="/syllabus" element={<SyllabusView />} />
-                        <Route path="/login" element={<LoginView />} />
                     </Route>
                 </Routes>
             </BrowserRouter>

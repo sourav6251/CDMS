@@ -29,7 +29,7 @@ const RoutineView = () => {
     const [open, setOpen] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState("1");
     const [users, setUsers] = useState<
-        { _id: string; name: string; email: string; role?: string }[]
+        { _id: string; name: string; email: string; role?: string ;model:string}[]
     >([]);
     const [manualEntry, setManualEntry] = useState(false);
 const [routine,setRoutine]=useState([])
@@ -46,6 +46,7 @@ const [loading, setLoading] = useState(false);
             semester: "",
             paperCode: "",
             paperName: "",
+            roomNo:"",
             professorName: "",
             professorID: "",
             startTime: "",
@@ -56,18 +57,39 @@ const [loading, setLoading] = useState(false);
 
     const handleRoutineSubmit = async (data: any) => {
         try {
-            console.log("Submitted Routine:", data);
-            await apiStore.addRoutine(data);
+            console.log("Raw Submitted Routine:", data);
+    
+            let professormodel;
+    
+            if (!manualEntry && data.professorID) {
+                const selectedUser = users.find((u) => u._id === data.professorID);
+                professormodel = selectedUser?.model || "normaluser"; // Default to "Users" if model not found
+            }
+    
+            const payload = {
+                ...data,
+                professorID: manualEntry ? undefined : data.professorID,
+                professorName: manualEntry ? data.professorName : undefined,
+                professormodel: manualEntry ? undefined : professormodel,
+            };
+    
+    
+            console.log("Cleaned Payload:", payload);
+    
+            await apiStore.addRoutine(payload);
             setOpen(false);
             reset();
         } catch (error) {
             console.error("Routine creation error:", error);
         }
     };
-
+    
+    
     const getAllUser = async () => {
         try {
             const response = await apiStore.getalluser();
+            console.log("response?.data?.data=>",response?.data?.data);
+            
             setUsers(response?.data?.data || []);
         } catch (error) {
             console.error("Failed to fetch users", error);
@@ -106,7 +128,7 @@ const [loading, setLoading] = useState(false);
             {/* Top Controls */}
             <div className="fixed top-12 right-10 z-[9999] flex h-10 gap-2">
                 <div></div>
-                <Select onValueChange={setSelectedSemester}>
+                <Select onValueChange={setSelectedSemester}  value={selectedSemester} >
                     <SelectTrigger className="w-[150px] bg-slate-200">
                         <SelectValue placeholder="Semester" />
                     </SelectTrigger>
@@ -208,6 +230,14 @@ const [loading, setLoading] = useState(false);
                                         className="w-full border p-2 rounded"
                                     />
                                 </div>
+                                </div>
+                                <div className="w-full">
+                                    <input
+                                        type="text"
+                                        placeholder="Room No"
+                                        {...register("roomNo")}
+                                        className="w-full border p-2 rounded"
+                                    />
                                 </div>
                                 {/* Professor Selection */}
                                 <div>
@@ -315,7 +345,7 @@ const [loading, setLoading] = useState(false);
                 <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
             </div>
             ) : (
-                <Routine routines={routine} />
+                <Routine routines={routine} fetchRoutine={fetchRoutine}/>
             )}
             </div>
 
