@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 interface userState {
     isLogin: boolean;
     // userID:String,
+    userName:string;
     userEmail: string;
     darkMode: boolean;
     role: string;
@@ -95,7 +96,8 @@ const RegisterPage = () => {
                 darkMode: darkMode,
                 isLogin: true,
                 role: response.data.data.role,
-                userEmail: response.data.data.name,
+                userEmail: response.data.data.email,
+                userName: response.data.data.name,
                 profilePic: response.data.data.profile_pic.url,
             };
             console.log("response=>", response.data.data.profile_pic.url);

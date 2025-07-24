@@ -249,25 +249,41 @@ class UserService {
             throw new Error(error.message);
         }
     }
- getAllExternalUsers = async () => {
+     getAllExternalUsers = async () => {
         try {
-          // Fetch normal users (name and email)
-          const normalUsers = await NormalUser.find({}, { name: 1, email: 1, _id: 0 });
+          // Fetch from NormalUser
+          const normalUsers = await NormalUser.find({}, { name: 1, email: 1 }).lean();
       
-          // Fetch users where role is 'external' (name and email)
+          // Fetch from Users with role "external"
           const externalUsers = await Users.find(
             { role: "external" },
-            { name: 1, email: 1, _id: 0 }
-          );
+            { name: 1, email: 1 }
+          ).lean();
       
-          // Combine both (optional)
-          const combinedUsers = [...normalUsers, ...externalUsers];
+          // Format NormalUser data
+          const formattedNormalUsers = normalUsers.map((user) => ({
+            userId: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            userModel: "normaluser",
+          }));
+          // Format External User data
+          const formattedExternalUsers = externalUsers.map((user) => ({
+            userId: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            userModel: "user",
+          }));
+      
+          // Combine both
+          const combinedUsers = [...formattedNormalUsers, ...formattedExternalUsers];
       
           return combinedUsers;
         } catch (error) {
           console.error("Error fetching users:", error);
-          throw error;
+          throw new Error("Failed to fetch users");
         }
       };
+      
 }
 export default new UserService();

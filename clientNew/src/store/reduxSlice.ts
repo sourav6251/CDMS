@@ -6,6 +6,7 @@ interface userState {
     isLogin: boolean;
     // userID:String,
     userEmail: string;
+    userName:string;
     darkMode: boolean;
     role: string;
     profilePic: string; 
@@ -15,6 +16,7 @@ const initialState: userState = {
     isLogin: false,
     userEmail: "String",
     darkMode: false,
+    userName:"Hello user",
     role: "user",
     profilePic: "https://ik.imagekit.io/eur1zq65p/jwt-hero.png",
 };
@@ -27,6 +29,7 @@ const reduxSlice = createSlice({
             state.isLogin = true;
             state.role = action.payload.role;
             state.userEmail = action.payload.userEmail;
+            state.userName=action.payload.userName;
             state.profilePic = action.payload.profilePic;
         },
         toggleDarkmode: (state, action: PayloadAction<boolean>) => {
@@ -36,6 +39,7 @@ const reduxSlice = createSlice({
             state.isLogin = false;
             state.role = "user";
             state.userEmail = "";
+            state.userName="Hello user";
             state.profilePic = "https://ik.imagekit.io/eur1zq65p/jwt-hero.png";
         },
     },

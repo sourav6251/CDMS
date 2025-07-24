@@ -20,7 +20,7 @@ interface loginData {
 interface CertificateFormData {
     // creator: string; // MongoDB ObjectId as string
     memoNumber: string;
-    user: string;
+    userID: string;
     userModel: string;
     designation: string;
     department: string;
@@ -179,7 +179,8 @@ class APIStore {
     getAllExternalUsers = async () => {
         try {
             const response = await axiosInstance.get("/user/external");
-            console.log("response=>", response);
+            console.log("responseresponse=>", response);
+            return response
         } catch (error: any) {
             this.handleError(error);
             throw new Error(error);
@@ -500,6 +501,40 @@ class APIStore {
             
         }
     }
+
+    getAllExternal=async()=>{
+        try {
+           return await axiosInstance.get("/user/external")
+        } catch (error:any) {
+            this.handleError(error)
+        }
+    }
+
+
+    getExternalCertificate=async()=>{
+        try {
+           return await axiosInstance.get("/certificate/external")
+        } catch (error:any) {
+            this.handleError(error)
+        }
+    }
+
+    getAllExternalCertificate=async()=>{
+        try {
+           return await axiosInstance.get("/certificate")
+        } catch (error:any) {
+            this.handleError(error)
+        }
+    }
+
+    updateCertificate=async(payload:any)=>{
+        try {
+          return  await axiosInstance.patch("/certificate",payload)
+        } catch (error:any) {
+            this.handleError(error)
+        }
+    }
+    
 }
 export default new APIStore();
   

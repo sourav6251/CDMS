@@ -36,17 +36,27 @@ const certificateSchema = new Schema(
             default: "Computer Science",
             required: true,
         },
-        college: {
+        institutionName: {
             type: String,
         },
         address: {
+            type: String,
+        }, 
+        gender: {
             type: String,
         },
         examType: {
             type: String,
             enum: ["Theory", "Practical",""],
         },
+        honorifics:{
+            type: String,
+            enum: ["Dr.", "Mr.", "Mrs"]
+        },
         year: {
+            type: String,
+        },
+        institutionType: {
             type: String,
         },
         semester: {
@@ -92,8 +102,8 @@ const certificateSchema = new Schema(
         timeOfExamination: {
             type: String,
         },
-        examStart: { type: String },
-        examEnd: { type: String },
+        examStartTime: { type: String },
+        examEndTime: { type: String },
         status: {
             type: String,
             enum: ["reject", "pending", "accept"],

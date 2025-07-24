@@ -361,6 +361,7 @@ console.log("newPassword=>",newPassword);
                 status: HTTP_STATUS.OK,
                 success: true,
                 message: "Status update successfully",
+                data:response
             });
         } catch (error) {
             sendResponse(res, {

@@ -33,7 +33,7 @@ const Header = () => {
     // const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const profile = useAppSelector((state) => state.user.profilePic);
-    const name = useAppSelector((state) => state.user.userEmail);
+    const name = useAppSelector((state) => state.user.userName);
     const isLogin = useAppSelector((state) => state.user.isLogin);
     const role = useAppSelector((state) => state.user.role);
     const handleDarkMode = () => {
@@ -69,21 +69,7 @@ const Header = () => {
         document.documentElement.classList.toggle("dark", darkMode);
     }, [darkMode]);
 
-    // Close dropdown on outside click
-    // useEffect(() => {
-    //     const closeDropdown = (e: MouseEvent) => {
-    //         if (
-    //             dropdownRef.current &&
-    //             !dropdownRef.current.contains(e.target as Node)
-    //         ) {
-    //             setDropdownOpen(false);
-    //         }
-    //     };
-    //     document.addEventListener("mousedown", closeDropdown);
-
-    //     return () => document.removeEventListener("mousedown", closeDropdown);
-    // }, []);
-
+ 
     return (
         <div
             className={`h-12 fixed w-full bg-transparent flex items-center px-4 pt-4 z-50 ${
