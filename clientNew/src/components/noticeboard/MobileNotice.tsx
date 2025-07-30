@@ -12,7 +12,7 @@ import { Eye, FilePenLine, Loader, Trash, Trash2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import PDFPreview from "../common/PDFPreview";
 import AuthenticateComponent from "@/utils/AuthenticateComponent";
-import apiStore from "@/api/apiStore";
+import apiStore from "@/api/apiStore"; 
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -88,7 +88,26 @@ const [view,setView]=useState(false)
           </h2>
 
           <p className="text-sm text-muted-foreground">
-            {notice.description}
+            {description && description.length > 96 ? (
+                                <>
+                                  {description.slice(0, 96)}
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <button className="text-blue-500 underline">...more</button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-h-[80vh] overflow-hidden">
+                                      <DialogHeader>
+                                        <DialogTitle>{notice.title}</DialogTitle>
+                                      </DialogHeader>
+                                      <div className="overflow-y-auto mt-2 text-sm text-gray-700 space-y-2 max-h-[60vh] pr-2">
+                                        {description}
+                                      </div>
+                                    </DialogContent>
+                                  </Dialog>
+                                </>
+                              ) : (
+                                description || "-"
+                              )}
           </p>
         </div>
 
@@ -104,14 +123,14 @@ const [view,setView]=useState(false)
         </DialogTrigger>
         {/* <DialogContent> */}
          
-        <DialogContent className="max-w-md w-full">
+        <DialogContent className="max-w-md w-full  max-h-[80vh] overflow-hidden">
         <DialogTitle className="text-center">Edit Notice</DialogTitle>
                                     <DialogHeader>
                                         <DialogDescription>
                                             Update the details for this notice.
                                         </DialogDescription>
                                     </DialogHeader>
-
+<div className="space-y-3   overflow-y-auto max-h-[60vh] ">
                                     <Input
                                         placeholder="Title"
                                         value={title}
@@ -153,6 +172,7 @@ const [view,setView]=useState(false)
                                         <Loader className="animate-spin text-blue-700" />}
                                     </Button>
                                 {/* </DialogContent> */}
+                                </div>
         </DialogContent>
       </Dialog>
     </div>
