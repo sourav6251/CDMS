@@ -12,7 +12,7 @@ const noticeboardSchema = new Schema(
         description: {
             type: String,
             trim: true,
-            maxLength: [500, "description must be in 500 letter"],
+            // maxLength: [500, "description must be in 500 letter"],
         },
         media: [
             {
@@ -24,7 +24,9 @@ const noticeboardSchema = new Schema(
                 },
             },
         ],
-
+expireDate:{
+    type:Date
+},
         user: {
             type: Schema.Types.ObjectId,
             ref: "user",

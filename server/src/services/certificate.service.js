@@ -187,6 +187,16 @@ class CertificateService {
         }
     }
 
+    async pendingCertificateRequest() {
+        try {
+            const certificates = await Certificate.find({status:"pending"})
+
+            return certificates.length;
+        } catch (error) {
+            throw new Error(error.message);
+        }
+    }
+
     async showExternalCertificates(id) {
         try {
             const certificates = await Certificate.find({user:id ,userModel:"user"})

@@ -150,7 +150,9 @@ class RoutineService {
 
     async getUserScheduleForToday(userId) {
       const objectId = new mongoose.Types.ObjectId(userId);
-      const dayName = "Wednesday";
+      // const dayName = "Wednesday";
+      const dayName = moment().tz("Asia/Kolkata").format("dddd"); // e.g., "Wednesday"
+    console.log("dayName",dayName);
     
       try {
         console.log("Enter into getUserScheduleForToday");

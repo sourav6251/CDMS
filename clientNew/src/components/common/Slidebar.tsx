@@ -6,6 +6,8 @@ import {
     HouseIcon,
     LibraryBig,
     Settings,
+    UserCog,
+    UserCog2Icon,
     Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -27,7 +29,8 @@ const Slidebar = ({ minimize, setMinimize }: SlidebarProps) => {
         { icon: ClipboardList, name: "Notice", path: "/notice" ,roles: ["admin", "hod","faculty","user"]},
         { icon: LibraryBig, name: "Syllabus", path: "/syllabus" ,roles: ["admin", "hod", "external","faculty","user"]},
         { icon: Calendar, name: "Routine", path: "/routine",roles: ["admin", "hod", "faculty","user"] },
-        { icon: Settings, name: "Setting", path: "/setting",roles: ["admin", "hod", "external","faculty"] },
+        { icon: UserCog2Icon, name: "Member", path: "/member",roles: ["hod"] },
+        // { icon: Settings, name: "Setting", path: "/setting",roles: ["admin", "hod", "external","faculty"] },
     ];
 
     return (

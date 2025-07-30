@@ -17,7 +17,13 @@ import { useAppSelector } from "@/store/reduxHooks";
 import AuthenticateComponent from "@/utils/AuthenticateComponent";
 import CertificateView from "./CertificateView";
 import { Loader } from "lucide-react";
-
+import {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+  } from "@/components/ui/popover";
+  
+import { Checkbox } from "@/components/ui/checkbox";
 
 // email
 // name
@@ -46,7 +52,7 @@ interface CertificateFormData {
     institutionType: string;
     institutionName: string;
     degree: string;
-    semester: string;
+    semester: string[];
     subject: string;
     paperName: string;
     dateOfExamination: string;
@@ -72,7 +78,7 @@ const initialData: CertificateFormData = {
     address: "",
     institutionType: "",
     institutionName: "",
-    semester: "",
+    semester: [],
     subject: "",
     degree: "",
     paperName: "",
@@ -89,16 +95,72 @@ const initialData: CertificateFormData = {
     CertificateType: "moderator",
     status: "pending",
 };
-
+interface Certificate {
+    _id: string;
+    memoNumber: string;
+    address: string;
+    creator: string;
+    user: string;
+    honorifics: "Dr."| "Mr."| "Mrs";
+    userModel: "user" | "normaluser";
+    CertificateType: "moderator" | "external";
+    designation: string;
+    department: string;
+    institutionType: "College"| "University";
+    institutionName: string;
+    degree: string;
+    semester: string[];
+    subject: string;
+    paperName: string;
+    dateOfExamination?: string;
+    examStartTime: string;
+    examEndTime: string;
+    gender: string;
+    studentsNo: string;
+    examinersNo: string;
+    examType: string;
+    nonExistUser: string;
+    status: "reject" | "pending" | "accept";
+    createdAt: string;
+  //   updatedAt: string;
+  //   __v: number;
+  }
+  
 const CertificateGenerator: React.FC = () => {
     const [formType, setFormType] = useState<FormType>("moderator");
     const [formData, setFormData] = useState<CertificateFormData>(initialData);
     const role = useAppSelector((state) => state.user.role);
-const [submiting,setSubmiting]=useState(false)
-    const handleChange = (field: keyof CertificateFormData, value: string) => {
+    const [submiting,setSubmiting]=useState(false)
+    const [show,setShow]=useState(true)
+    const [certificates, setCertificates] = useState<Certificate[]>([]);
+    const [featchCertificates, setfeatchCertificates] = useState(false);
+    // const handleChange = (field: keyof CertificateFormData, value: string) => {
+    //     setFormData((prev) => ({ ...prev, [field]: value }));
+    // };
+    const handleChange = (field: keyof CertificateFormData, value: string | string[]) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
-    };
-
+      };
+    // const handleCheckboxChange=(semester: string) => {
+    // setFormData((prev) => ({ ...prev, semester:prev.semester.includes(semester) }))
+    // }
+      const fetchCertificates = async () => {
+        setfeatchCertificates(false)
+        try {
+          const response =
+            role === "external"
+              ? await apiStore.getExternalCertificate()
+              : await apiStore.getAllExternalCertificate();
+    
+          setCertificates(response?.data.data || []);
+          console.log("fetchCertificates=>",response?.data.data);
+          
+        } catch (error) {
+          console.error("Fetch error:", error);
+        }finally{
+            setfeatchCertificates(true)
+        }
+      };
+      
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmiting(true)
@@ -106,17 +168,28 @@ const [submiting,setSubmiting]=useState(false)
         // console.log("handleSubmit=>",formData);
         formData.CertificateType=formType
         await apiStore.generateCertificate(formData);
-        // console.log(`${formType} Form Submitted:`, formData);
         setSubmiting(false)
     };
-
+useEffect(()=>{
+    fetchCertificates();
+},[])
     return (
         <div className="w-full max-w-5xl mx-auto p-6">
-            <CertificateView/>
-            <h2 className="text-2xl font-bold text-center mb-4">
+            {!featchCertificates?<> <div className="flex items-center justify-center h-[50vh]">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
+        </div></>:<>
+        {
+            certificates.length!=0 &&
+            <CertificateView certificate={certificates} fetchCertificate={fetchCertificates}/>
+        }
+            </>}
+            {/* <div> */}
+            <Button onClick={()=>setShow(!show)} className="end-0" hidden={!featchCertificates}>Generate Certificate</Button>
+            <h2 hidden={show} className="text-2xl font-bold text-center mb-4">
                 Certificate Generator
             </h2>
             <Tabs
+             hidden={show}
                 defaultValue="moderator"
                 className="w-full"
                 onValueChange={(val) => {
@@ -141,6 +214,7 @@ const [submiting,setSubmiting]=useState(false)
                         handleSubmit={handleSubmit}
                         role={role}
                         submiting={submiting}
+                        // handleCheckboxChange={handleCheckboxChange}
                     />
                 </TabsContent>
 
@@ -152,9 +226,12 @@ const [submiting,setSubmiting]=useState(false)
                         handleSubmit={handleSubmit}
                         role={role}
                         submiting={submiting}
+                        // handleCheckboxChange={handleCheckboxChange}
                     />
                 </TabsContent>
             </Tabs>
+            {/* </div> */}
+            
         </div>
     );
 };
@@ -162,7 +239,7 @@ const [submiting,setSubmiting]=useState(false)
 interface FormProps {
     type: FormType;
     formData: CertificateFormData;
-    handleChange: (field: keyof CertificateFormData, value: string) => void;
+    handleChange: (field: keyof CertificateFormData, value: string | string[]) => void;
     handleSubmit: (e: React.FormEvent) => void;
     role: string;
     submiting:boolean;
@@ -174,9 +251,13 @@ const Form: React.FC<FormProps> = ({
     handleSubmit,
     type,
     role,
-    submiting
+    submiting,
+    // handleCheckboxChange
 }) => {
 
+  
+    // const value = String(sem);
+    // const isChecked = formData.semester.includes(value);
     const [allUsers, setAllUsers] = useState<{ name: string; email: string; userId: string; userModel: string }[]>([]);
     const [manuallEntry,setManuallEntry]=useState(false)
     const getAllExternalUsers = async () => {
@@ -198,7 +279,7 @@ const Form: React.FC<FormProps> = ({
         return !isNaN(num) && num % 2 !== 0;
     };
     const examTypeOptions = ["Theory", "Practical", "Project"];
-
+ 
     const certificateRef = useRef<HTMLDivElement>(null);
     return (
         <>
@@ -387,29 +468,63 @@ const Form: React.FC<FormProps> = ({
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                            <div className="space-y-1">
-                                <Label>Semester</Label>
-                                <Select
-                                    onValueChange={(val) =>
-                                        handleChange("semester", val)
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Semester" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {semesters.map((s) => (
-                                            <SelectItem
-                                                key={s}
-                                                value={String(s)}
-                                            >
-                                                {s}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
 
+{type === "moderator" ? (
+  <div className="space-y-1">
+    <Label>Semester (Multiple)</Label>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-between">
+          {formData.semester.length > 0
+            ? `${formData.semester.length} semester(s) selected`
+            : "Select Semesters"}
+          <span className="ml-2">▼</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-full sm:w-[300px] max-h-60 overflow-y-auto p-2">
+        {semesters.map((sem) => {
+          const value = String(sem);
+          const isChecked = formData.semester.includes(value);
+          return (
+            <div key={value} className="flex items-center gap-2 py-2">
+              <Checkbox
+                id={`semester-${value}`}
+                checked={isChecked}
+                onCheckedChange={() => {
+                  const updatedSemesters = isChecked
+                    ? formData.semester.filter((s) => s !== value)
+                    : [...formData.semester, value];
+                  handleChange("semester", updatedSemesters);
+                }}
+              />
+              <Label htmlFor={`semester-${value}`} className="text-sm sm:text-base">
+                {value}
+              </Label>
+            </div>
+          );
+        })}
+      </PopoverContent>
+    </Popover>
+  </div>
+) : (
+  <div className="space-y-1">
+    <Label>Semester</Label>
+    <Select
+      onValueChange={(val) => handleChange("semester", [val])}
+    >
+      <SelectTrigger>
+        <SelectValue placeholder="Select Semester" />
+      </SelectTrigger>
+      <SelectContent>
+        {semesters.map((s) => (
+          <SelectItem key={s} value={String(s)}>
+            {s}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  </div>
+)}
                             <div className="space-y-1">
                                 <Label>Degree</Label>
                                 <Select
@@ -476,7 +591,7 @@ const Form: React.FC<FormProps> = ({
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                             <div className="space-y-1">
-                                <Label>dateOfExamination</Label>
+                                <Label>Date Of Examination</Label>
                                 <Input
                                     type="date"
                                     value={formData.dateOfExamination}
@@ -520,6 +635,7 @@ const Form: React.FC<FormProps> = ({
                                     </div>
                                 </>
                             )}
+                            <AuthenticateComponent roles={["hod","external"]}>
                             <div className="space-y-1">
                                 <Label>Gender</Label>
                                 <Select
@@ -539,6 +655,7 @@ const Form: React.FC<FormProps> = ({
                                     </SelectContent>
                                 </Select>
                             </div>
+                            </AuthenticateComponent>
                         </div>
 
                         {type === "external" && (

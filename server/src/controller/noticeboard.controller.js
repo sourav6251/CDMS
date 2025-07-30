@@ -5,9 +5,9 @@ import { sendResponse } from "../utils/response.handler.js";
 
 class NoticeboardController {
     async createNotice(req, res) {
-        const { title, description } = req.body;
-        console.log("req.body=>", title, description);
         // console.log("req.originalname=>",   req.file.originalname);
+        const { title, description ,expireDate} = req.body;
+        console.log("req.body=>", title, description);
 
         const { _id } = req.user;
         let bufferFile = null;
@@ -22,6 +22,7 @@ class NoticeboardController {
                 _id,
                 title,
                 description,
+                expireDate,
                 bufferFile,
                 originalName,
             };
@@ -42,6 +43,7 @@ class NoticeboardController {
                 status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
                 message: error.message || RESPONSE_MESSAGES.INTERNAL_ERROR,
                 success: false,
+                error:error
             });
         }
     }
@@ -82,11 +84,12 @@ class NoticeboardController {
         }
         try {
             const id = req.params.noticeId;
-            const { title, description } = req.body;
+            const { title, description,expireDate } = req.body;
 
             const updateData = {
                 title,
                 description,
+                expireDate,
                 bufferFile,
                 originalName,
             };

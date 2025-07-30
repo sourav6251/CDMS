@@ -180,9 +180,9 @@ class CertificateController {
 
     //update certificate status
     async updateCertificatestatus(req, res) {
-        console.log("updateCertificatestatus");
 
         const { memoNumber, status } = req.body;
+        console.log("updateCertificatestatus",memoNumber, status );
         const certificateId = req.params.certificateId;
         try {
             const certificate =
@@ -227,7 +227,7 @@ class CertificateController {
             }
 
             return sendResponse(res, {
-                status: HTTP_STATUS.NO_CONTENT,
+                status: HTTP_STATUS.OK,
                 message: RESPONSE_MESSAGES.NO_CERTIFICATE,
                 success: true,
                 data: certificates,
@@ -243,11 +243,10 @@ class CertificateController {
             });
         }
     }
-    async showExternalCertificates(req, res) {
-
-        const {id}=req.user;
+        // Show all certificates (with optional filters)
+    async pendingCertificateRequest(req, res) {
         try {
-            const certificates = await certificateService.showExternalCertificates(id);
+            const certificates = await certificateService.pendingCertificateRequest();
 
             if (certificates && certificates.length > 0) {
                 return sendResponse(res, {
@@ -259,11 +258,36 @@ class CertificateController {
             }
 
             return sendResponse(res, {
-                status: HTTP_STATUS.NO_CONTENT,
+                status: HTTP_STATUS.OK,
                 message: RESPONSE_MESSAGES.NO_CERTIFICATE,
                 success: true,
                 data: certificates,
             });
+        } catch (error) {
+            console.log(error);
+
+            return sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                message: RESPONSE_MESSAGES.INTERNAL_ERROR,
+                success: false,
+                error: error,
+            });
+        }
+    }
+    
+    async showExternalCertificates(req, res) {
+
+        const {id}=req.user;
+        try {
+            const certificates = await certificateService.showExternalCertificates(id);
+
+                return sendResponse(res, {
+                    status: HTTP_STATUS.OK,
+                    message: RESPONSE_MESSAGES.CERTIFICATE_GET,
+                    success: true,
+                    data: certificates,
+                });
+       
         } catch (error) {
             console.log(error);
 

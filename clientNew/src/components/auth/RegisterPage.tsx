@@ -9,7 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Eye, EyeOff, User, Lock, Mail } from "lucide-react";
+import { Eye, EyeOff, User, Lock, Mail, Phone } from "lucide-react";
 import { Card } from "../ui/card";
 import { toast } from "sonner";
 import apiStore from "@/api/apiStore";
@@ -36,6 +36,7 @@ const RegisterPage = () => {
         firstName: "",
         lastName: "",
         email: "",
+        phoneNo:"",
         password: "",
         confirmPassword: "",
         role: "external",
@@ -62,6 +63,7 @@ const RegisterPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+console.log("formData=>",formData);
 
         // Check for empty fields
         const hasEmptyField = Object.values(formData).some(
@@ -123,16 +125,15 @@ const RegisterPage = () => {
                 <OTPInput email={formData.email} />
             ) : (
                 <>
-                    {" "}
                     <Card className="w-full max-w-md px-8 py-6">
                         <div className="text-center mb-5">
                             <h2 className="text-3xl font-bold">
-                                {showLogin ? "Sign In" : "Create Account"}
+                                {!showLogin ? "Sign In" : "Create Account"}
                             </h2>
                         </div>
 
                         {/* Login Form */}
-                        {showLogin ? (
+                        {!showLogin ? (
                             <form
                                 onSubmit={handleLoginSubmit}
                                 className="space-y-6"
@@ -205,7 +206,7 @@ const RegisterPage = () => {
                                     <button
                                         type="button"
                                         className="text-blue-600 underline"
-                                        onClick={() => setShowLogin(false)}
+                                        onClick={() => setShowLogin(!showLogin)}
                                     >
                                         Register
                                     </button>
@@ -259,6 +260,21 @@ const RegisterPage = () => {
                                             type="email"
                                             name="email"
                                             value={formData.email}
+                                            onChange={handleChange}
+                                            required
+                                            className="pl-10"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Label htmlFor="phoneNo">Phone No</Label>
+                                    <div className="relative">
+                                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" />
+                                        <Input
+                                            id="phoneNo"
+                                            type="tel"
+                                            name="phoneNo"
+                                            value={formData.phoneNo}
                                             onChange={handleChange}
                                             required
                                             className="pl-10"
@@ -332,13 +348,14 @@ const RegisterPage = () => {
                                             )}
                                         </button>
                                     </div>
-                                </div>
+                                </div> 
 
                                 <div>
                                     <Label>Select Role</Label>
                                     <Select
                                         value={formData.role}
                                         onValueChange={handleRoleChange}
+                                        required
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select role" />
@@ -363,7 +380,7 @@ const RegisterPage = () => {
                                     <button
                                         type="button"
                                         className="text-blue-600 underline"
-                                        onClick={() => setShowLogin(true)}
+                                        onClick={() => setShowLogin(!showLogin)}
                                     >
                                         Sign In
                                     </button>

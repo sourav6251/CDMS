@@ -42,7 +42,7 @@ const PDFPreview: React.FC<PDFViewerProps> = ({
             <div className="flex justify-between items-center px-4 py-2 border-b bg-muted">
                 <h3 className="text-sm font-medium truncate">{fileName}</h3>
                 <div className="flex gap-2 items-center">
-                    <Button
+                    {/* <Button
   size="icon"
   variant="ghost"
   onClick={async () => {
@@ -68,7 +68,7 @@ const PDFPreview: React.FC<PDFViewerProps> = ({
   aria-label="Download PDF"
 >
   <Download className="w-4 h-4" />
-</Button>
+</Button> */}
 {isMobile && (
   <Button
     size="icon"

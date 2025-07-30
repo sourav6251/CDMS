@@ -5,25 +5,30 @@ import { NormalUser } from "../model/normaluser.model.js";
 import mailService from "./mail.service.js";
 
 class UserService {
-    async createUser({ password, email, name, role }) {
+    async createUser({ password, email, name, role,phoneNo }) {
         if (role === "hod") {
             throw new Error("Can not create HOD");
         }
 
-        if (await this.isExist(email)) {
-            console.log("User already exist=>>");
+        if (await this.isExistByEmail(email) ) {
+            console.log("User already exist=>>",email);
+
+            throw new Error("User already exist");
+        }    
+            if (await this.isExistByPhone(phoneNo) ) {
+            console.log("User already existphoneNo=>>",phoneNo);
 
             throw new Error("User already exist");
         }
         try {
-            return await Users.create({ name, email, password, role });
+            return await Users.create({ name, email, password, role ,phoneNo});
         } catch (error) {
             throw new Error(error.message);
         }
     }
 
     async createHod({ email, name, password }) {
-        if (await this.isExist(email)) {
+        if (await this.isExistByEmail(email)) {
             throw new Error("User already exist");
         }
         try {
@@ -62,7 +67,7 @@ class UserService {
             await mailService.sendMailForOTP(user.email, data);
             return "success";
         } catch (error) {
-            throw new Error("User not found");
+            throw new Error(error);
         }
     }
 
@@ -146,6 +151,45 @@ class UserService {
             throw new Error("Failed to fetch users");
         }
     }
+    async getAllRegisterUser() {
+        try {
+            // const normalUsers = await NormalUser.find().select("name email").lean();
+            const users = await Users.find();
+    
+       
+            return users;
+        } catch (error) {
+            console.error("getAllUser error:", error);
+            throw new Error("Failed to fetch users");
+        }
+    }
+    
+    async getAllUnregisterUser() {
+        try {
+            // const normalUsers = await NormalUser.find().select("name email").lean();
+            const users = await NormalUser.find();
+    
+       
+            return users;
+        } catch (error) {
+            console.error("getAllUser error:", error);
+            throw new Error("Failed to fetch users");
+        }
+    }
+    
+    
+    async getAllRegisterRequestUser() {
+        try {
+            // const normalUsers = await NormalUser.find().select("name email").lean();
+            const users = await Users.find({isApproved:false});
+    
+       
+            return users;
+        } catch (error) {
+            console.error("getAllUser error:", error);
+            throw new Error("Failed to fetch users");
+        }
+    }
     
     async deleteUser(id) {
         try {
@@ -176,7 +220,7 @@ class UserService {
         }
     }
 
-    async updateUser({ id, name, email, bufferFile, originalName }) {
+    async updateUser({ id, name, email,phoneNo, bufferFile, originalName }) {
         try {
             let user = await Users.findById(id);
             if (!user) {
@@ -202,6 +246,7 @@ class UserService {
             // Update common fields
             user.name = name;
             user.email = email;
+            user.phoneNo=phoneNo;
             await user.save();
 
             return user; // ✅ always return updated user
@@ -234,8 +279,11 @@ class UserService {
         }
     }
 
-    async isExist(email) {
+    async isExistByEmail(email) {
         return await Users.findOne({ email });
+    }
+    async isExistByPhone(phoneNo) {
+        return await Users.findOne({ phoneNo });
     }
     async approveByHOD(id) {
         try {

@@ -63,25 +63,31 @@ const MeetingView = () => {
   const [creating, setCreating] = useState(false);
   const [meetings, setMeetings] = useState([]);
   const [loadingMeetings, setLoadingMeetings] = useState(true);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  
   const isMobile = IsMobile("(max-width: 768px)");
   const userRole: string = useAppSelector((state) => state.user.role);
 
   useEffect(() => {
     fetchMeeting();
   }, []);
+  
 
-  const fetchMeeting = async () => {
+  const fetchMeeting = async (page = 1) => {
     setLoadingMeetings(true);
     try {
-      const meetingResponse = await apiStore.getMeetingsByParticipantId();
-      setMeetings(meetingResponse);
+      const res = await apiStore.getMeetingsByParticipantId(page);
+      setMeetings(res.meetings);
+      setTotalPages(res.totalPages);
+      setCurrentPage(res.currentPage);
     } catch (error) {
       console.error("Error fetching meetings:", error);
     } finally {
       setLoadingMeetings(false);
     }
   };
+  
 
   const fetchAllUsers = async () => {
     try {
@@ -268,12 +274,30 @@ const MeetingView = () => {
 
   return (
     <div
-      className={`w-full flex flex-col items-center ${
-        isMobile ? "h-full overflow-y-auto" : "px-10"
+      className={`w-full flex flex-col items-centerjustify-between ${
+        isMobile ? " h-full  overflow-y-auto" : "px-10"
       }`}
     >
       {AddButton}
       {renderMeetings()}
+      {totalPages > 1 && (
+  <div className="flex justify-center gap-2 mt-6">
+    {[...Array(totalPages)].map((_, index) => {
+      const pageNum = index + 1;
+      return (
+        <Button
+          key={pageNum}
+          variant={pageNum === currentPage ? "default" : "outline"}
+          disabled={pageNum === currentPage}
+          onClick={() => fetchMeeting(pageNum)}
+        >
+          {pageNum}
+        </Button>
+      );
+    })}
+  </div>
+)}
+
     </div>
   );
 };

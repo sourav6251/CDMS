@@ -13,7 +13,7 @@ class UserValidation {
                 .string()
                 .trim()
                 .min(8, "Password must be at least 8 characters"),
-            role: z.enum(["faculty", "external", "student", "admin"], {
+            role: z.enum(["faculty", "external", "student", "admin", "hod"], {  //todo Remove Admin ,HOD
                 message: "only faculty external student roles are accepeted",
             }),
         }),

@@ -4,7 +4,7 @@ import { logout, toggleDarkmode } from "@/store/reduxSlice";
 import { Moon, Sun } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IsMobile } from "../hook/IsMobile";
-import { useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 
 import {
     Dialog,
@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import apiStore from "@/api/apiStore";
 import { toast } from "sonner";
+import AuthenticateComponent from "@/utils/AuthenticateComponent";
 const Header = () => {
     const dispatch = useAppDispatch();
     const darkMode = useAppSelector((state) => state.user.darkMode);
@@ -68,7 +69,9 @@ const Header = () => {
     useEffect(() => {
         document.documentElement.classList.toggle("dark", darkMode);
     }, [darkMode]);
-
+const setting=async()=>{
+    navigate("/setting");
+}
  
     return (
         <div
@@ -160,6 +163,8 @@ const Header = () => {
                         </DropdownMenuItem>
 
                         <DropdownMenuItem>Report Bug</DropdownMenuItem>
+                        <AuthenticateComponent roles={["hod", "faculty", "external"]}>
+                        <DropdownMenuItem onClick={setting}>Setting</DropdownMenuItem></AuthenticateComponent>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

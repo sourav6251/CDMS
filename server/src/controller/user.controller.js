@@ -6,7 +6,7 @@ import { removeCookie, sendCookie } from "../utils/tokenGenarate.js";
 import imagekitService from "../services/imagekit.service.js";
 class UserController {
     async createUser(req, res) {
-        const { password, email, name, role } = req.body;
+        const { password, email, name, role,phoneNo } = req.body;
         console.log("password=>",password);
         console.log("email=>",email);
         console.log("name=>",name);
@@ -17,7 +17,7 @@ class UserController {
                 password,
                 email,
                 name,
-                role,
+                role,phoneNo
             });
             console.log("result=>", result);
 
@@ -99,6 +99,7 @@ class UserController {
                 status: HTTP_STATUS.BAD_REQUEST,
                 success: false,
                 message: error.message,
+                error:error.message
             });
         }
     }
@@ -197,16 +198,73 @@ class UserController {
         }
     }
 
+    async getAllRegisterUser(req, res) {
+        try {
+            const users = await userService.getAllRegisterUser();
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Users fetched successfully.",
+                data: users,
+            });
+        } catch (error) {
+            sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                success: false,
+                message: error.message,
+                error,
+            });
+        }
+    }
+
+    async getAllUnregisterUser(req, res) {
+        try {
+            const users = await userService.getAllUnregisterUser();
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Users fetched successfully.",
+                data: users,
+            });
+        } catch (error) {
+            sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                success: false,
+                message: error.message,
+                error,
+            });
+        }
+    }
+
+    async getAllRegisterRequestUser(req, res) {
+        try {
+            const users = await userService.getAllRegisterRequestUser();
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Users fetched successfully.",
+                data: users,
+            });
+        } catch (error) {
+            sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                success: false,
+                message: error.message,
+                error,
+            });
+        }
+    }
+
     async deleteUser(req, res) {
         try {
             const { id } = req.user;
             await userService.deleteUser(id);
             removeCookie(res, "User deleted successfully.");
-            // sendResponse(res, {
-            //     status: HTTP_STATUS.OK,
-            //     success: true,
-            //     message: "User deleted successfully.",
-            // });
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Logged out successfully.",
+            });
         } catch (error) {
             sendResponse(res, {
                 status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -237,7 +295,9 @@ class UserController {
 
     async updateUser(req, res) {
         try {
-            const { name, email } = req.body;
+            const { name, email,phoneNo } = req.body;
+            console.log("phoneNo=>",phoneNo);
+            
             const { id } = req.user;
             let bufferFile = null;
             let originalName = null;
@@ -253,6 +313,7 @@ class UserController {
                 id,
                 name,
                 email,
+                phoneNo,
                 bufferFile,
                 originalName,
             });

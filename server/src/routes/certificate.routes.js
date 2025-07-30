@@ -12,6 +12,7 @@ const router = express.Router();
 router
     .post( "/", validate(certificateValidation.create),isAuthenticate,authorizeRoles("hod", "external"),certificateController.createCertificate)
     .get("/",isAuthenticate,authorizeRoles("hod"), certificateController.showCertificates)
+    .get("/pendingcertificate",isAuthenticate,authorizeRoles("hod"), certificateController.pendingCertificateRequest)
     .get("/external",isAuthenticate,authorizeRoles("external"), certificateController.showExternalCertificates)
     .patch("/",isAuthenticate,authorizeRoles("hod", "external"),certificateController.updateCertificate)
     .put("/statusupadte/:certificateId",validate(certificateValidation.update),isAuthenticate,authorizeRoles("hod"),certificateController.updateCertificatestatus)

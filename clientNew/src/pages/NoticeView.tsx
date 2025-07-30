@@ -16,9 +16,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 interface NoticeFormFields {
     title: string;
     description: string;
+    expireDate:string;
     media?: File | null;
   }
 const NoticeView = () => {
@@ -30,6 +32,7 @@ const [creating,setCreating]=useState(false)
   const [formData, setFormData] = useState<NoticeFormFields>({
     title: "",
     description: "",
+    expireDate:"",
     media: null,
   });
   
@@ -54,7 +57,7 @@ const [creating,setCreating]=useState(false)
       await apiStore.addNotice(formData); 
       fetchAllNotice();
       // setDialogOpen(false);
-      setFormData({ title: "", description: "", media: null });
+      setFormData({ title: "", description: "",expireDate:"", media: null });
     } catch (err) {
       console.error("Failed to add notice", err);
     }finally{
@@ -79,14 +82,14 @@ const [creating,setCreating]=useState(false)
        </div>
      </DialogTrigger>
    
-     <DialogContent className="max-w-md w-full">
+     <DialogContent className="max-w-md w-full  max-h-[90vh] overflow-y-auto">
        <DialogHeader>
          <DialogTitle>Add New Notice</DialogTitle>
          <DialogDescription>
            Fill in the details to post a new notice to the board.
          </DialogDescription>
        </DialogHeader>
-   
+   <Label>Title</Label>
        <Input
          placeholder="Title"
          value={formData.title}
@@ -95,6 +98,7 @@ const [creating,setCreating]=useState(false)
          }
        />
    
+   <Label>Description</Label>
        <Textarea
          placeholder="Description"
          value={formData.description}
@@ -102,7 +106,19 @@ const [creating,setCreating]=useState(false)
            setFormData({ ...formData, description: e.target.value })
          }
        />
-   
+   <Label>Expire Date</Label>
+       <Input
+         type="date"
+         value={formData.expireDate}
+         onChange={(e) =>
+           setFormData({
+             ...formData,
+             expireDate: e.target.value,
+           })
+         }
+         required
+       />
+       <Label>Media</Label>
        <Input
          type="file"
          accept="image/*,video/*"
@@ -128,9 +144,15 @@ const [creating,setCreating]=useState(false)
         ? notices.map((notice:any) => (
             <MobileNotice key={notice._id} notice={notice}  fetchNotice={fetchAllNotice}/>
           ))
-        : notices.map((notice:any) => (
-            <PcNotice key={notice._id} notice={notice} fetchNotice={fetchAllNotice}/>
-          ))}</>}
+        : 
+            <PcNotice  notices={notices} fetchNotice={fetchAllNotice}/>
+            
+
+        // notices.map((notice:any) => (
+        //     <PcNotice key={notice._id} notice={notice} fetchNotice={fetchAllNotice}/>
+        //   ))
+          }</>
+        }
    
     </div>
   );

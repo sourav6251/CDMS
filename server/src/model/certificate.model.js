@@ -60,7 +60,7 @@ const certificateSchema = new Schema(
             type: String,
         },
         semester: {
-            type: String,
+            type: [String],
             enum: ["1", "2", "3", "4", "5", "6", "7", "8"],
             required: true,
         },

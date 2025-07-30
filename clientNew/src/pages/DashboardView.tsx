@@ -11,7 +11,7 @@ const DashboardView = () => {
       {role === "hod" && <HODDashboard />}
       {role === "faculty" && <FacultyDashboard />}
       {role === "external" && <ExternalDashboard />}
-      <div className="px-6 py-4">hello</div>
+      {/* <div className="px-6 py-4">hello</div> */}
     </div>
 
   )

@@ -5,6 +5,7 @@ interface registerForm {
     firstName: string;
     lastName: string;
     email: string;
+    phoneNo:string;
     password: string;
     confirmPassword: string;
     role: string;
@@ -28,7 +29,7 @@ interface CertificateFormData {
     address?: string;
     examType?: string;
     year?: string;
-    semester: string;
+    semester: string[];
     degree?: string;
     paperName: string;
     subject?: string;
@@ -57,9 +58,9 @@ interface NewUser {
 interface NoticeFormFields {
     title: string;
     description: string;
+    expireDate: string;
     media?: File | null;
 }
-
 interface UpdateNotice{
     _id: string;
     title: string;
@@ -71,7 +72,7 @@ interface UpdateNotice{
 }
 class APIStore {
     handleError = (error: any) => {
-        console.log(error);
+        console.log("handleError=>",error);
 
         if (
             error.response?.status === 400 &&
@@ -82,8 +83,21 @@ class APIStore {
                 .join("\n"); // separate by new lines
 
             toast.error(errorMessages); // will display all messages together
-        } else {
-            toast.error(error.response?.data?.error || "Something went wrong");
+        }else if( Array.isArray(error.response.data.error)){
+            const errorMessages = error.response.data.error
+            .map((e: any) => `• ${e.message}`) // add bullet point for clarity
+            .join("\n"); // separate by new lines
+
+        toast.error(errorMessages); // will display all messages together
+        }
+         else{
+            
+            const errorMessages = error.response.data.error
+                // .map((e: any) => `• ${e.message}`) // add bullet point for clarity
+                // .join("\n"); // separate by new lines
+
+                console.log("Array.isArray=>",errorMessages);
+            toast.error(errorMessages); // will display all messages together
         }
     };
     register = async (registerData: registerForm) => {
@@ -92,6 +106,7 @@ class APIStore {
             name: fullName,
             email: registerData.email,
             password: registerData.password,
+            phoneNo:registerData.phoneNo,
             // role: "hod",
             role: registerData.role,
         };
@@ -186,23 +201,109 @@ class APIStore {
             throw new Error(error);
         }
     };
-
-    getMeetingsByParticipantId = async () => {
+    //todo:For certificate
+    pendingCertificateRequest = async () => {
         try {
-            const response = await axiosInstance.get("/meeting");
-            console.log("getMeetingsByParticipantId=>", response);
-            toast.success("Featch Meeting successfully");
-            return response.data.data;
+            const response = await axiosInstance.get("/certificate/pendingcertificate");
+            console.log("responseresponse=>", response);
+            return response
         } catch (error: any) {
             this.handleError(error);
             throw new Error(error);
         }
     };
 
+    getMeetingsByParticipantId = async (page:number, limit = 10) => {
+        try {
+          const response = await axiosInstance.get(`/meeting`,{params:{
+            page,
+            limit
+          }});
+          toast.success("Fetched meetings successfully");
+          return response.data.data;
+        } catch (error) {
+          this.handleError(error);
+          throw error;
+        }
+    };
+      
     getalluser = async () => {
         try {
             const response = await axiosInstance.get("/user/getalluser");
             console.log("response=>", response);
+            toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+            
+    deleteUser = async () => {
+        try {
+            const response = await axiosInstance.delete("/user");
+            console.log("delete response=>", response);
+            toast.success("User deleted successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+      
+    getallregisteruser = async () => {
+        try {
+            const response = await axiosInstance.get("/user/getallregisteruser");
+            // console.log("response=>", response);
+            // toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+      
+    getAllUnregisterUser = async () => {
+        try {
+            const response = await axiosInstance.get("/user/getallunregisteruser");
+            // console.log("response=>", response);
+            // toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+      
+    getAllRegisterRequestUser = async () => {
+        try {
+            const response = await axiosInstance.get("/user/registerrequest");
+            // console.log("registerrequest=>", response);
+            // toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+      
+    hodApprovel = async (userID:string) => {
+        try {
+            const response = await axiosInstance.put(`/user/approve/${userID}`);
+            // console.log("response=>", response);
+            toast.success("Featch getalluser successfully");
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+
+      
+    hodDelete = async (userID:string) => {
+        try {
+            const response = await axiosInstance.delete(`/user/hoddelete/${userID}`);
+            // console.log("response=>", response);
             toast.success("Featch getalluser successfully");
             return response;
         } catch (error: any) {
@@ -279,6 +380,20 @@ class APIStore {
         }
     };
 
+    upcommingMeeting = async () => {
+        try {
+            const response = await axiosInstance.get(
+                `/meeting/upcomming`
+            );
+            console.log("response=>", response);
+            toast.success("Successfully notify");
+            return response;
+        } catch (error: any) {
+            this.handleError(error);
+            throw new Error(error);
+        }
+    };
+
     getallNotice = async () => {
         try {
             const response = await axiosInstance.get("/noticeboard");
@@ -295,6 +410,7 @@ class APIStore {
 
         form.append("title", payload.title);
         form.append("description", payload.description);
+        form.append("expireDate", payload.expireDate);
         if (payload.media != null) {
             form.append("media", payload.media);
         }
@@ -320,10 +436,13 @@ class APIStore {
         }
     };
 
-    updateNotice = async (noticeId: string,payload: NoticeFormFields) => {
+    updateNotice = async (noticeId: string,payload: any) => {
+        console.log("updateNotic payloade=>",payload);
+        
         const form=new FormData();
         form.append("title",payload.title)
         form.append("description",payload.description)
+        form.append("expireDate",payload.expireDate)
         if (payload.media!=null) {
             
         form.append("media",payload.media)
@@ -339,11 +458,26 @@ class APIStore {
         }
     };
 
-    getallSyllabus = async (semester:string) => {
+    // getallSyllabus = async (semester:string) => {
+    //     try {
+    //         const response = await axiosInstance.get("/syllabus",{
+    //             params: {
+    //                 semester,
+    //             },
+    //         });
+    //         return response;
+    //     } catch (error: any) {
+    //         this.handleError(error);
+    //         throw new Error(error);
+    //     }
+    // };
+    getallSyllabus = async (semester:string,page:string,limit:string) => {
         try {
             const response = await axiosInstance.get("/syllabus",{
                 params: {
                     semester,
+                    page,
+                    limit
                 },
             });
             return response;
@@ -352,6 +486,7 @@ class APIStore {
             throw new Error(error);
         }
     };
+
 
     addSyllabus = async (payload:any) => {
        
@@ -434,12 +569,14 @@ class APIStore {
         const form=new FormData();
         form.append("email",payload.email)
         form.append("name",payload.name)
+        form.append("phoneNo",payload.phoneNo)
         if (payload.photo) {
             form.append("photo",payload.photo)
         }
         try {
            
           const response=  await axiosInstance.put(`/user`,form)
+          toast.success("User update successfully")
             return response;
         } catch (error: any) {
             this.handleError(error);
@@ -453,12 +590,15 @@ class APIStore {
         try {
           const response=  await axiosInstance.post("/user/generate_otp")
         } catch (error:any) {
+            console.log("Enter into generateOTP2");
             this.handleError(error)
         }
     }
 
     verifyotp = async (otpData: string) => {
+        console.log("Enter into verifyotp");
         try {
+            
            await axiosInstance.post("/user/verifyotp", {otp:otpData});
             toast.success("OTP verify sucessfully");
         } catch (error: any) {
@@ -530,6 +670,22 @@ class APIStore {
     updateCertificate=async(payload:any)=>{
         try {
           return  await axiosInstance.patch("/certificate",payload)
+        } catch (error:any) {
+            this.handleError(error)
+        }
+    }
+
+    deleteCertificate=async(certificateID:string)=>{
+        try {
+          return  await axiosInstance.delete(`/certificate/${certificateID}`,)
+        } catch (error:any) {
+            this.handleError(error)
+        }
+    }
+
+    certificateStatusupadte=async(certificateID:string,payload:any)=>{
+        try {
+          return  await axiosInstance.put(`/certificate/statusupadte/${certificateID}`,payload)
         } catch (error:any) {
             this.handleError(error)
         }

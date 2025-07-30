@@ -48,19 +48,23 @@ class MeetingController {
 
     async showMeeting(req, res) {
         const { id } = req.user;
+        const { page = 1, limit = 10 } = req.query;
         try {
-            const meetings = await meetingService.getMeetingsByParticipantId(
-                id
-            );
+            const { meetings, total } = await meetingService.getMeetingsByParticipantId(id, +page, +limit);
 
             return sendResponse(res, {
-                status: HTTP_STATUS.OK,
-                message:
-                    RESPONSE_MESSAGES.FETCH_SUCCESS ||
-                    "Meetings fetched successfully",
-                success: true,
-                data: meetings,
+            status: HTTP_STATUS.OK,
+            message: RESPONSE_MESSAGES.FETCH_SUCCESS || "Meetings fetched successfully",
+            success: true,
+            data: {
+                meetings,
+                total,
+                totalPages: Math.ceil(total / +limit),
+                currentPage: +page,
+            },
             });
+
+     
         } catch (error) {
             return sendResponse(res, {
                 status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -70,7 +74,7 @@ class MeetingController {
             });
         }
     }
-
+ 
     async updateMeeting(req, res) {
         try {
             const meetingId = req.params.meetingId;
@@ -134,6 +138,29 @@ class MeetingController {
         try {
             const id = req.params.meetingId;
             const deletedMeeting = await meetingService.notifyMeeting(id);
+
+            return sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                message:
+                    RESPONSE_MESSAGES.MEETING_DELETED ||
+                    "Meeting deleted successfully",
+                success: true,
+                data: deletedMeeting,
+            });
+        } catch (error) {
+            return sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                message: RESPONSE_MESSAGES.INTERNAL_ERROR,
+                success: false,
+                error,
+            });
+        }
+    }
+
+
+    async upComming(req, res) {
+        try {
+            const deletedMeeting = await meetingService.upComming();
 
             return sendResponse(res, {
                 status: HTTP_STATUS.OK,

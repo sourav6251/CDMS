@@ -78,101 +78,106 @@ class MeetingService {
             throw new Error("Failed to create meeting: " + error.message);
         }
     }
-    async  getMeetingsByParticipantId(participantId) {
+
+
+    // async  getMeetingsByParticipantId(participantId) {
+    //     try {
+    //       const meetings = await Mettings.find({
+    //         joinusList: participantId,
+    //       })
+    //         .sort({ meetingTime: -1 })
+    //         .select("-__v") // optionally exclude __v
+    //         .lean();
+      
+    //       for (const meeting of meetings) {
+    //         // Populate the creator (user field)
+    //         const creator = await Users.findById(meeting.user)
+    //           .select("name email role")
+    //           .lean();
+      
+    //         meeting.user = creator;
+      
+    //         // Prepare full participant objects
+    //         const fullParticipants = [];
+      
+    //         for (let i = 0; i < meeting.joinusList.length; i++) {
+    //           const id = meeting.joinusList[i];
+    //           const model = meeting.joinusModel[i];
+      
+    //           let participantData = null;
+      
+    //           if (model === "user") {
+    //             participantData = await Users.findById(id)
+    //               .select("_id name email role")
+    //               .lean();
+    //           } else if (model === "normaluser") {
+    //             participantData = await NormalUser.findById(id)
+    //               .select("_id name email phoneNo")
+    //               .lean();
+    //           }
+      
+    //           if (participantData) {
+    //             fullParticipants.push(participantData);
+    //           }
+    //         }
+      
+    //         meeting.joinusList = fullParticipants;
+      
+    //         // Optionally remove joinusModel since we merged the data
+    //         delete meeting.joinusModel;
+    //       }
+      
+    //       return meetings;
+    //     } catch (error) {
+    //       console.error("Error fetching meetings:", error);
+    //       throw error;
+    //     }
+    //   }
+    async getMeetingsByParticipantId(participantId, page = 1, limit = 10) {
         try {
-          const meetings = await Mettings.find({
-            joinusList: participantId,
-          })
-            .sort({ meetingTime: -1 })
-            .select("-__v") // optionally exclude __v
-            .lean();
+          const skip = (page - 1) * limit;
       
+          const [meetings, total] = await Promise.all([
+            Mettings.find({ joinusList: participantId })
+              .sort({ meetingTime: -1 }) // latest first
+              .skip(skip)
+              .limit(limit)
+              .select("-__v")
+              .lean(),
+            Mettings.countDocuments({ joinusList: participantId })
+          ]);
+      
+          // Populate creator and participants (same as before)
           for (const meeting of meetings) {
-            // Populate the creator (user field)
-            const creator = await Users.findById(meeting.user)
-              .select("name email role")
-              .lean();
-      
+            const creator = await Users.findById(meeting.user).select("name email role").lean();
             meeting.user = creator;
       
-            // Prepare full participant objects
             const fullParticipants = [];
-      
             for (let i = 0; i < meeting.joinusList.length; i++) {
               const id = meeting.joinusList[i];
               const model = meeting.joinusModel[i];
-      
-              let participantData = null;
+              let participant = null;
       
               if (model === "user") {
-                participantData = await Users.findById(id)
-                  .select("_id name email role")
-                  .lean();
+                participant = await Users.findById(id).select("_id name email role").lean();
               } else if (model === "normaluser") {
-                participantData = await NormalUser.findById(id)
-                  .select("_id name email phoneNo")
-                  .lean();
+                participant = await NormalUser.findById(id).select("_id name email phoneNo").lean();
               }
       
-              if (participantData) {
-                fullParticipants.push(participantData);
-              }
+              if (participant) fullParticipants.push(participant);
             }
-      
             meeting.joinusList = fullParticipants;
-      
-            // Optionally remove joinusModel since we merged the data
             delete meeting.joinusModel;
           }
       
-          return meetings;
+          return { meetings, total };
         } catch (error) {
           console.error("Error fetching meetings:", error);
           throw error;
         }
       }
       
-    // async getMeetingsByParticipantId(participantId) {
-    //     try {
-    //         const meetings = await Mettings.find({
-    //             joinusList: participantId,
-    //         })
-    //             .sort({ meetingTime: -1 }) // Sort by meetingTime: newest first
-    //             .select("title description meetingTime meetingArea joinusList joinusModel")
-    //             .lean();
-    
-    //         for (const meeting of meetings) {
-    //             meeting.joinedUsers = [];
-    
-    //             for (let i = 0; i < meeting.joinusList.length; i++) {
-    //                 const id = meeting.joinusList[i];
-    //                 const modelName = meeting.joinusModel[i];
-    
-    //                 let participantData = null;
-    
-    //                 if (modelName === "user") {
-    //                     participantData = await Users.findById(id)
-    //                         .select("name email")
-    //                         .lean();
-    //                 } else if (modelName === "normaluser") {
-    //                     participantData = await NormalUser.findById(id)
-    //                         .select("name email")
-    //                         .lean();
-    //                 }
-    
-    //                 if (participantData) {
-    //                     meeting.joinedUsers.push(participantData);
-    //                 }
-    //             }
-    //         }
-    
-    //         return meetings;
-    //     } catch (error) {
-    //         console.error("Error fetching meetings:", error);
-    //         throw error;
-    //     }
-    // }
-    
+
     async updateMeeting({
         meetingId,
         title,
@@ -299,6 +304,26 @@ class MeetingService {
             throw error;
         }
     }
+    async upComming() {
+        try {
+            const upcomingMeetings = await Mettings.find({
+                meetingTime: { $gt: this.getISTTime() },
+              })
+              
+            return upcomingMeetings.length;
+        } catch (error) {
+            console.error("Error in Meeting:", error);
+            throw error;
+        }
+    }
+    // meeting.service.js
+
+ getISTTime() {
+    const now = new Date();
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    return new Date(now.getTime() + istOffset - now.getTimezoneOffset() * 60000);
+  }
+  
 }
 
 export default new MeetingService();

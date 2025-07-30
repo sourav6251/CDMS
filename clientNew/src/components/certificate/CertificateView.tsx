@@ -29,11 +29,19 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
 
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -59,7 +67,7 @@ interface Certificate {
   institutionType: "College"| "University";
   institutionName: string;
   degree: string;
-  semester: string;
+  semester: string[];
   subject: string;
   paperName: string;
   dateOfExamination?: string;
@@ -75,10 +83,14 @@ interface Certificate {
 //   updatedAt: string;
 //   __v: number;
 }
+interface Props {
+  certificate: Certificate[];
+  fetchCertificate: () => void;
+}
 
-const CertificateView = () => {
+const CertificateView: React.FC<Props>  = ({certificate , fetchCertificate}) => {
   const role = useAppSelector((state) => state.user.role);
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [memoNumber,setMemoNumber]=useState("")
 
   const prefixOptions = ["Dr.", "Mr.", "Mrs"];
   const designationOptions = [
@@ -87,25 +99,14 @@ const CertificateView = () => {
       "Associate Professor",
       "Assistant Professor",
   ];
-  const examTypeOptions = ["Theory", "Practical", "Project"];
+  const examTypeOptions = ["Theory", "Practical"];
   const institutionTypes = ["College", "University"];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
-  const genders = ["Male", "Female", "Other"];
+  const genders = ["Male", "Female"];
     const [formData, setFormData] = useState<Certificate>();
     const [editableCert, setEditableCert] = useState<Certificate | null>(null);
 
-  const fetchCertificates = async () => {
-    try {
-      const response =
-        role === "external"
-          ? await apiStore.getExternalCertificate()
-          : await apiStore.getAllExternalCertificate();
-
-      setCertificates(response?.data.data || []);
-    } catch (error) {
-      console.error("Fetch error:", error);
-    }
-  };
+  
   const handleEdit=async(e: React.FormEvent)=>{
    
     e.preventDefault();
@@ -113,25 +114,41 @@ const CertificateView = () => {
     try {
         const response=await apiStore.updateCertificate(formData)
         console.log("response=>",response);
-        
+        fetchCertificate()
 
     } catch (error:any) {
-        
     }
     
   }
 
-
+const certificateApprove=async(certificateId:string,status:string)=>{
+  if (status ==='accept' && memoNumber==='') {
+    alert("Enter memo number")
+    return;    
+  }
+    try {
+      const payload={
+        memoNumber:memoNumber,
+         status:status
+      }
+     await apiStore.certificateStatusupadte(certificateId,payload)
+     fetchCertificate()
+    } catch (error:any) {
+      
+    }finally{
+      setMemoNumber("")
+    }
+}
   
-const handleChange = (field: keyof Certificate, value: string) => {
+const handleChange = (field: keyof Certificate, value: string| string[],date:string ="2") => {
     setFormData((prev) => {
       if (!prev) return prev;
   
       let updatedValue: any = value;
   
       if (field === "dateOfExamination") {
-        const selectedDate = new Date(value);
-        updatedValue = selectedDate.toISOString(); // "2025-07-24T00:00:00.000Z"
+        const selectedDate = new Date(date);
+        updatedValue = selectedDate.toISOString(); 
       }
   
       return {
@@ -144,16 +161,13 @@ const handleChange = (field: keyof Certificate, value: string) => {
   
   const handleDelete = async (id: string) => {
     try {
-      // await apiStore.deleteCertificate(id);
-      setCertificates((prev) => prev.filter((cert) => cert._id !== id));
+    await  apiStore.deleteCertificate(id)
+    fetchCertificate()
     } catch (error) {
       console.error("Delete error:", error);
     }
   };
 
-  useEffect(() => {
-    fetchCertificates();
-  }, []);
 
   return (
     <div className="p-4 space-y-4">
@@ -168,8 +182,8 @@ const handleChange = (field: keyof Certificate, value: string) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {certificates.length > 0 ? (
-              certificates.map((cert) => (
+            {certificate.length > 0 ? (
+              certificate.map((cert) => (
                 <TableRow key={cert._id}>
                   <TableCell>
                     {new Date(cert.createdAt).toLocaleDateString("en-IN", {
@@ -183,7 +197,8 @@ const handleChange = (field: keyof Certificate, value: string) => {
                     {/* Download Certificate */}
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" 
+                                disabled={cert.status !== "accept"}>
                           <DownloadIcon className="w-4 h-4" />
                         </Button>
                       </TooltipTrigger>
@@ -198,7 +213,7 @@ const handleChange = (field: keyof Certificate, value: string) => {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                disabled={cert.status === "accept"}
+                                disabled={cert.status !== "pending"}
                                 onClick={() => setFormData({ ...cert })}
                               >
                                 <Edit className="w-4 h-4" />
@@ -215,7 +230,7 @@ const handleChange = (field: keyof Certificate, value: string) => {
                                 
                               </DialogHeader>
                                         
-        <div className="overflow-y-auto max-h-[70vh] pr-2">
+                          <div className="overflow-y-auto max-h-[70vh] pr-2">
                               <form 
                                  className="space-y-4 mt-4  max-h-full">
                                   <Card>
@@ -344,26 +359,63 @@ const handleChange = (field: keyof Certificate, value: string) => {
                                           <div className="grid grid-cols-1 md:grid-cols-3 gap-5"> */}
                                               <div className="space-y-1">
                                                   <Label>Semester</Label>
-                                                  <Select
-                                                      onValueChange={(val) =>
-                                                          handleChange("semester", val)
-                                                      }
-                                                      value={formData?.semester}
-                                                  >
-                                                      <SelectTrigger>
+                                                  {formData?.CertificateType === "moderator" ? (
+                                                    <div className="space-y-1">
+                                                      {/* <Label>Semester (Multiple)</Label> */}
+                                                      <Popover>
+                                                        <PopoverTrigger asChild>
+                                                          <Button variant="outline" className="w-full justify-between">
+                                                            {formData.semester.length > 0
+                                                              ? `${formData.semester.length} semester(s) selected`
+                                                              : "Select Semesters"}
+                                                            <span className="ml-2">▼</span>
+                                                          </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-full sm:w-[300px] max-h-60 overflow-y-auto p-2">
+                                                          {semesters.map((sem) => {
+                                                            const value = String(sem);
+                                                            const isChecked = formData.semester.includes(value);
+                                                            return (
+                                                              <div key={value} className="flex items-center gap-2 py-2">
+                                                                <Checkbox
+                                                                  id={`semester-${value}`}
+                                                                  checked={isChecked}
+                                                                  onCheckedChange={() => {
+                                                                    const updatedSemesters = isChecked
+                                                                      ? formData.semester.filter((s) => s !== value)
+                                                                      : [...formData.semester, value];
+                                                                    handleChange("semester", updatedSemesters);
+                                                                  }}
+                                                                />
+                                                                <Label htmlFor={`semester-${value}`} className="text-sm sm:text-base">
+                                                                  {value}
+                                                                </Label>
+                                                              </div>
+                                                            );
+                                                          })}
+                                                        </PopoverContent>
+                                                      </Popover>
+                                                    </div>
+                                                  ) : (
+                                                    <div className="space-y-1">
+                                                      {/* <Label>Semester</Label> */}
+                                                      <Select
+                                                        onValueChange={(val) => handleChange("semester", [val])}
+                                                        value={formData?.semester[0]}
+                                                      >
+                                                        <SelectTrigger>
                                                           <SelectValue placeholder="Select Semester" />
-                                                      </SelectTrigger>
-                                                      <SelectContent>
+                                                        </SelectTrigger>
+                                                        <SelectContent>
                                                           {semesters.map((s) => (
-                                                              <SelectItem
-                                                                  key={s}
-                                                                  value={String(s)}
-                                                              >
-                                                                  {s}
-                                                              </SelectItem>
+                                                            <SelectItem key={s} value={String(s)}>
+                                                              {s}
+                                                            </SelectItem>
                                                           ))}
-                                                      </SelectContent>
-                                                  </Select>
+                                                        </SelectContent>
+                                                      </Select>
+                                                    </div>
+                                                  )}
                                               </div>
 
                                               <div className="space-y-1">
@@ -434,7 +486,7 @@ const handleChange = (field: keyof Certificate, value: string) => {
 
                                           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                                               <div className="space-y-1">
-                                                  <Label>dateOfExamination</Label>
+                                                  <Label>Date Of Examination</Label>
                                                   <Input
                                                     type="date"
                                                     value={
@@ -443,7 +495,7 @@ const handleChange = (field: keyof Certificate, value: string) => {
                                                         : ""
                                                     }
                                                     onChange={(e) =>
-                                                        handleChange("dateOfExamination", e.target.value)
+                                                        handleChange("dateOfExamination", "",e.target.value)
                                                     }
                                                     />
                                               </div>
@@ -559,37 +611,123 @@ const handleChange = (field: keyof Certificate, value: string) => {
 
                     {/* Approve/Reject only for HOD */}
                     <AuthenticateComponent roles={["hod"]}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm">
+
+
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" disabled={cert.status!=='pending'} onClick={()=>setMemoNumber(cert.memoNumber)}>
                             <CheckCircle className="w-4 h-4 text-green-600" />
                           </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Approve</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Are you sure?</DialogTitle>
+                            </DialogHeader>
+                            <Label className="text-lg font-bold">Enter Memo Number</Label>
+                            <Input type="text" value={memoNumber} onChange={(e) => setMemoNumber(e.target.value)}/>
+                            <span hidden={memoNumber!==""} className="text-sm text-rose-500"> *Enter Memonumber</span>
+                            {/* <div className="space-y-1">
+                                                            <Label>Gender</Label>
+                                                            <Select
+                                                                onValueChange={(val) =>
+                                                                    handleChange("gender", val)
+                                                                }
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Select Gender" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {genders.map((opt) => (
+                                                                        <SelectItem key={opt} value={opt}>
+                                                                            {opt}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div> */}
+                                                        {/* //todo: set gender into HOD */}
+                            <DialogFooter>
+                              <Button
+                                variant="destructive"
+                                onClick={() => certificateApprove(cert._id,"accept")}
+                                className="bg-green-600"
+                              >
+                                Approve
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete</TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <X className="w-4 h-4 text-red-600" />
-                          </Button>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={cert.status !== "pending"}
+                              >
+                                <X className="w-4 h-4 text-red-600" />
+                              </Button>
+                            </DialogTrigger>
+
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Reject Certificate</DialogTitle>
+                              </DialogHeader>
+                              <p className="text-sm text-muted-foreground">
+                                Are you sure you want to reject this certificate?
+                              </p>
+                              <DialogFooter>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => certificateApprove(cert._id, "reject")}
+                                >
+                                  Confirm Reject
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         </TooltipTrigger>
                         <TooltipContent>Reject</TooltipContent>
                       </Tooltip>
+
                     </AuthenticateComponent>
 
                     {/* Delete Certificate */}
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDelete(cert._id)}
-                        >
-                          <Trash className="w-4 h-4" />
-                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="destructive" size="sm">
+                              <Trash className="w-4 h-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Are you sure?</DialogTitle>
+                            </DialogHeader>
+                            <p>This action cannot be undone. This will permanently delete the certificate.</p>
+                            <DialogFooter>
+                              <Button
+                                variant="destructive"
+                                onClick={() => handleDelete(cert._id)}
+                              >
+                                Confirm Delete
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                       </TooltipTrigger>
                       <TooltipContent>Delete</TooltipContent>
                     </Tooltip>
+
+
                   </TableCell>
                 </TableRow>
               ))

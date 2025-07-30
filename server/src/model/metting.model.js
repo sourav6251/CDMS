@@ -26,7 +26,7 @@ const meetingSchema = new Schema(
             {
               type: Schema.Types.ObjectId,
               refPath: 'joinusModel',
-              required: true,
+              required: true, 
             }
           ],
           joinusModel: [

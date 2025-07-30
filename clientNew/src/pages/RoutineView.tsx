@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IsMobile } from "@/components/hook/IsMobile";
 import AuthenticateComponent from "@/utils/AuthenticateComponent";
-import { Plus } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import apiStore from "@/api/apiStore";
 
 import {
@@ -28,6 +28,7 @@ const RoutineView = () => {
     const isMobile = IsMobile("(max-width: 768px)");
     const [open, setOpen] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState("1");
+    const [upload,setUpload]=useState(false)
     const [users, setUsers] = useState<
         { _id: string; name: string; email: string; role?: string ;model:string}[]
     >([]);
@@ -56,6 +57,7 @@ const [loading, setLoading] = useState(false);
     });
 
     const handleRoutineSubmit = async (data: any) => {
+        setUpload(true)
         try {
             console.log("Raw Submitted Routine:", data);
     
@@ -81,6 +83,10 @@ const [loading, setLoading] = useState(false);
             reset();
         } catch (error) {
             console.error("Routine creation error:", error);
+        }finally{
+
+            fetchRoutine(selectedSemester)
+            setUpload(false)
         }
     };
     
@@ -190,7 +196,7 @@ const [loading, setLoading] = useState(false);
                                             <SelectValue placeholder="Select day" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => (
+                                            {[ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => (
                                                 <SelectItem key={day} value={day}>
                                                     {day}
                                                 </SelectItem>
@@ -327,8 +333,9 @@ const [loading, setLoading] = useState(false);
 
                                 {/* Submit */}
                                 <div className="pt-4">
-                                    <Button type="submit" className="w-full">
-                                        Submit Routine
+                                    <Button type="submit" className="w-full" disabled={upload} >
+                                        {upload?<Loader className="animate-spin"/>:"Submit Routine"}
+                                        
                                     </Button>
                                 </div>
                             </form>

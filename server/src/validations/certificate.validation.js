@@ -8,7 +8,8 @@ class CertificateValidation {
             department: z.string({
                 required_error: "Department ID is required",
             }),
-            semester: z.string({ required_error: "Semester ID is required" }),
+            // semester: z.array({ required_error: "Semester ID is required" }),
+            semester: z.array(z.string({ required_error: "Semester is required" })).min(1),
             // paperCode: z
             //     .string({ required_error: "Paper code is required" })
             //     .min(3, "Paper code must be at least 3 characters")
