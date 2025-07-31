@@ -26,7 +26,7 @@ export const sendCookie = (user, res, message, statusCode = 200) => {
     const cookieOptions = {
         httpOnly: true, // Prevent JavaScript access for security
         secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-        sameSite:"None",//"none", //process.env.SAMESITE,//"lax",
+        sameSite:process.env.SAMESITE,//"lax",
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         path: "/",
     };
@@ -61,7 +61,7 @@ export const removeCookie = (res) => {
     const cookieOptions = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "None",
+        sameSite: process.env.SAMESITE,
         expires: new Date(0), // Expire the cookie immediately
         path: "/",
     };
