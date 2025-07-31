@@ -6,7 +6,6 @@ import {
     CalendarRange,
     Clock,
     FilePenLine,
-    Flashlight,
     Loader,
     MapPinned,
     Plus,

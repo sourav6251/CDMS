@@ -5,7 +5,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { Ghost, Loader, Trash2 } from "lucide-react";
+import {  Loader, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import apiStore from "@/api/apiStore";
 import AuthenticateComponent from "@/utils/AuthenticateComponent";

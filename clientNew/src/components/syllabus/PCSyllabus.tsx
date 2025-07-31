@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { FilePenLine, Trash2, Eye, X, Loader, Download } from "lucide-react";
 import PDFPreview from "../common/PDFPreview";
 import AuthenticateComponent from "@/utils/AuthenticateComponent";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import {
     Tooltip,
     TooltipTrigger,

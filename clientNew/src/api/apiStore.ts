@@ -61,15 +61,15 @@ interface NoticeFormFields {
     expireDate: string;
     media?: File | null;
 }
-interface UpdateNotice{
-    _id: string;
-    title: string;
-    description: string;
-    media: File | null;
-    user: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
+// interface UpdateNotice{
+//     _id: string;
+//     title: string;
+//     description: string;
+//     media: File | null;
+//     user: string;
+//     createdAt: Date;
+//     updatedAt: Date;
+// }
 class APIStore {
     handleError = (error: any) => {
         console.log("handleError=>",error);
@@ -588,7 +588,7 @@ class APIStore {
         console.log("Enter into generateOTP");
         
         try {
-          const response=  await axiosInstance.post("/user/generate_otp")
+            await axiosInstance.post("/user/generate_otp")
         } catch (error:any) {
             console.log("Enter into generateOTP2");
             this.handleError(error)

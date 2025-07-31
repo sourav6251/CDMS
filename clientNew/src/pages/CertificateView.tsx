@@ -1,6 +1,6 @@
 import CertificateGenerator from "@/components/certificate/CertificateGenerator";
 // import MobileCertificateGenerator from "@/components/certificate/MobileCertificateGenerator";
-import { IsMobile } from "@/components/hook/IsMobile";
+// import { IsMobile } from "@/components/hook/IsMobile";
 
 const CertificateView = () => {
     // const isMobile = IsMobile("(max-width: 768px)");

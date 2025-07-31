@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { IsMobile } from "@/components/hook/IsMobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAppDispatch, useAppSelector } from "@/store/reduxHooks";
+import { useAppDispatch } from "@/store/reduxHooks";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -66,7 +66,7 @@ const SettingView = () => {
         fetchUser();
     }, []);
 
-    const email = useAppSelector((state) => state.user.userEmail);
+    // const email = useAppSelector((state) => state.user.userEmail);
 
     const handleImageClick = () => {
         fileInputRef.current?.click();
@@ -260,7 +260,9 @@ const SettingView = () => {
                     value={digit}
                     onChange={(e) => handleOTPChange(e, index)}
                     onKeyDown={(e) => handleOTPKeyDown(e, index)}
-                    ref={(el) => (otpRefs.current[index] = el)}
+                    // ref={(el) => (otpRefs.current[index] = el)}
+
+                    ref={(el) => { otpRefs.current[index] = el; }}
                     className="w-12 h-12 text-center text-xl font-extrabold tracking-widest rounded-md shadow-md shadow-gray-400 focus:shadow-lg focus:shadow-gray-800 transition-all duration-200"
                     />
                 ))}
@@ -341,7 +343,7 @@ const SettingView = () => {
                     value={digit}
                     onChange={(e) => handleOTPChange(e, index)}
                     onKeyDown={(e) => handleOTPKeyDown(e, index)}
-                    ref={(el) => (otpRefs.current[index] = el)}
+                    ref={(el) => { otpRefs.current[index] = el; }}
                     className="w-12 h-12 text-center text-xl font-extrabold tracking-widest rounded-md shadow-md shadow-gray-400 focus:shadow-lg focus:shadow-gray-800 transition-all duration-200"
                     />
                 ))}

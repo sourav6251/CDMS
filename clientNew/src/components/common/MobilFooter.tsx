@@ -4,19 +4,17 @@ import {
   FileBadge,
   HouseIcon,
   LibraryBig,
-  Settings,
-  UserCog2Icon,
   Users,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useAppSelector } from "@/store/reduxHooks";
+// import { useAppSelector } from "@/store/reduxHooks";
 import AuthenticateComponent from "@/utils/AuthenticateComponent";
 
 const MobilFooter = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isLogin = useAppSelector((state) => state.user.isLogin);
+  // const isLogin = useAppSelector((state) => state.user.isLogin);
 
   const slideItems = 
      [

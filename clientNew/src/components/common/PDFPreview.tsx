@@ -3,13 +3,13 @@
 import React from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, X } from "lucide-react";
+import {  Share2, X } from "lucide-react";
 
 // Styles required for react-pdf
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { IsMobile } from "../hook/IsMobile";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 // Point to the worker you copied into `public/`
 pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";

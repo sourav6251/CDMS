@@ -5,8 +5,6 @@ import {
     FileBadge,
     HouseIcon,
     LibraryBig,
-    Settings,
-    UserCog,
     UserCog2Icon,
     Users,
 } from "lucide-react";

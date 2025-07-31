@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect,  useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -274,13 +274,13 @@ const Form: React.FC<FormProps> = ({
         }
     }, [role]);
 
-    const isOddSemester = (sem: string) => {
-        const num = parseInt(sem);
-        return !isNaN(num) && num % 2 !== 0;
-    };
+    // const isOddSemester = (sem: string) => {
+    //     const num = parseInt(sem);
+    //     return !isNaN(num) && num % 2 !== 0;
+    // };
     const examTypeOptions = ["Theory", "Practical", "Project"];
  
-    const certificateRef = useRef<HTMLDivElement>(null);
+    // const certificateRef = useRef<HTMLDivElement>(null);
     return (
         <>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">

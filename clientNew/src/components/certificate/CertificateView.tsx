@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useAppSelector } from "@/store/reduxHooks";
 import apiStore from "@/api/apiStore";
 import {
@@ -89,7 +89,7 @@ interface Props {
 }
 
 const CertificateView: React.FC<Props>  = ({certificate , fetchCertificate}) => {
-  const role = useAppSelector((state) => state.user.role);
+  // const role = useAppSelector((state) => state.user.role);
   const [memoNumber,setMemoNumber]=useState("")
 
   const prefixOptions = ["Dr.", "Mr.", "Mrs"];
@@ -104,7 +104,7 @@ const CertificateView: React.FC<Props>  = ({certificate , fetchCertificate}) => 
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
   const genders = ["Male", "Female"];
     const [formData, setFormData] = useState<Certificate>();
-    const [editableCert, setEditableCert] = useState<Certificate | null>(null);
+    // const [editableCert, setEditableCert] = useState<Certificate | null>(null);
 
   
   const handleEdit=async(e: React.FormEvent)=>{
