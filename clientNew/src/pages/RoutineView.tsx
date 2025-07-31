@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { IsMobile } from "@/components/hook/IsMobile";
+// import { IsMobile } from "@/components/hook/IsMobile";
 import AuthenticateComponent from "@/utils/AuthenticateComponent";
 import { Loader, Plus } from "lucide-react";
 import apiStore from "@/api/apiStore";
@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import Routine from "@/components/routine/Routine";
 
 const RoutineView = () => {
-    const isMobile = IsMobile("(max-width: 768px)");
+    // const isMobile = IsMobile("(max-width: 768px)");
     const [open, setOpen] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState("1");
     const [upload,setUpload]=useState(false)
