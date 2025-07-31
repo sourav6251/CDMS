@@ -61,7 +61,7 @@ export const removeCookie = (res) => {
     const cookieOptions = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: "none",
         expires: new Date(0), // Expire the cookie immediately
         path: "/",
     };
