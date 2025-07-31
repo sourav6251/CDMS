@@ -1,4 +1,6 @@
 {
+  "allowJs": true, // Allow JavaScript files
+  "checkJs": false,
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
@@ -16,3 +18,4 @@
 }
 
 //tsconfig.json
+
