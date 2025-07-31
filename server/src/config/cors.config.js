@@ -6,5 +6,6 @@ const corsConfig = cors({
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
 });
+console.log("FRONTEND URI=>",process.env.FRONTEND_URI);
 
 export default corsConfig;
