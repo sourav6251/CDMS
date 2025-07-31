@@ -6,13 +6,18 @@ import { removeCookie, sendCookie } from "../utils/tokenGenarate.js";
 import imagekitService from "../services/imagekit.service.js";
 class UserController {
     async createUser(req, res) {
-        const { password, email, name, role } = req.body;
+        const { password, email, name, role,phoneNo } = req.body;
+        console.log("password=>",password);
+        console.log("email=>",email);
+        console.log("name=>",name);
+        console.log("role=>",role);
+        
         try {
             const result = await userService.createUser({
                 password,
                 email,
                 name,
-                role,
+                role,phoneNo
             });
             console.log("result=>", result);
 
@@ -26,7 +31,11 @@ class UserController {
             let status = HTTP_STATUS.INTERNAL_SERVER_ERROR;
             // let message = RESPONSE_MESSAGES.INTERNAL_ERROR;
             if (
-                error.message == "User already exist" ||
+                error.message == "User already exist"
+            ) {
+                status = HTTP_STATUS.CONFLICT;
+                // message = RESPONSE_MESSAGES.USER_EXIST;
+            }if (
                 error.message === "Can not create HOD"
             ) {
                 status = HTTP_STATUS.BAD_REQUEST;
@@ -74,8 +83,11 @@ class UserController {
 
     async generateOtp(req, res) {
         try {
-            const id = req.params.userID;
-            const otp = await userService.generateOtp(id);
+            const {email} = req.body;
+            const id = req.user?.id || null;
+            console.log("req.user?.id=>",id);
+            
+            const otp = await userService.generateOtp(email,id);
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
                 success: true,
@@ -87,6 +99,7 @@ class UserController {
                 status: HTTP_STATUS.BAD_REQUEST,
                 success: false,
                 message: error.message,
+                error:error.message
             });
         }
     }
@@ -94,11 +107,14 @@ class UserController {
     async verifyOtp(req, res) {
         try {
             const { otp, email } = req.body;
-            await userService.verifyOtp({ otp, email });
+
+            const id = req.user?.id || null;
+            await userService.verifyOtp({ otp, email,id });
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
                 success: true,
                 message: "OTP verified successfully.",
+                error:"OTP verified successfully."
                 // data: user,
             });
         } catch (error) {
@@ -113,11 +129,14 @@ class UserController {
                 status,
                 success: false,
                 message: error.message,
+                error:error.message,
             });
         }
     }
 
     async loginUser(req, res) {
+        console.log("Enterinto login");
+        
         try {
             const { email, password } = req.body;
             const user = await userService.loginUser({ email, password });
@@ -135,6 +154,7 @@ class UserController {
                 status,
                 success: false,
                 message: error.message,
+                error: error.message,
             });
         }
     }
@@ -178,16 +198,73 @@ class UserController {
         }
     }
 
+    async getAllRegisterUser(req, res) {
+        try {
+            const users = await userService.getAllRegisterUser();
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Users fetched successfully.",
+                data: users,
+            });
+        } catch (error) {
+            sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                success: false,
+                message: error.message,
+                error,
+            });
+        }
+    }
+
+    async getAllUnregisterUser(req, res) {
+        try {
+            const users = await userService.getAllUnregisterUser();
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Users fetched successfully.",
+                data: users,
+            });
+        } catch (error) {
+            sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                success: false,
+                message: error.message,
+                error,
+            });
+        }
+    }
+
+    async getAllRegisterRequestUser(req, res) {
+        try {
+            const users = await userService.getAllRegisterRequestUser();
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Users fetched successfully.",
+                data: users,
+            });
+        } catch (error) {
+            sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                success: false,
+                message: error.message,
+                error,
+            });
+        }
+    }
+
     async deleteUser(req, res) {
         try {
             const { id } = req.user;
             await userService.deleteUser(id);
             removeCookie(res, "User deleted successfully.");
-            // sendResponse(res, {
-            //     status: HTTP_STATUS.OK,
-            //     success: true,
-            //     message: "User deleted successfully.",
-            // });
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Logged out successfully.",
+            });
         } catch (error) {
             sendResponse(res, {
                 status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -199,7 +276,7 @@ class UserController {
     }
     async hoddelete(req, res) {
         try {
-            const { id } = req.params.userID;
+            const id  = req.params.userID;
             await userService.hoddelete(id);
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
@@ -218,18 +295,25 @@ class UserController {
 
     async updateUser(req, res) {
         try {
-            const { name, email } = req.body;
+            const { name, email,phoneNo } = req.body;
+            console.log("phoneNo=>",phoneNo);
+            
             const { id } = req.user;
             let bufferFile = null;
             let originalName = null;
-            if (req.file.buffer) {
+            if (req.file) {
                 bufferFile = req.file.buffer;
                 originalName = req.file.originalname;
-            }
+              }
+          
+
+            console.log("Email=>",email);
+            
             await userService.updateUser({
                 id,
                 name,
                 email,
+                phoneNo,
                 bufferFile,
                 originalName,
             });
@@ -270,11 +354,15 @@ class UserController {
 
     async updatePassword(req, res) {
         try {
-            const { email, newPasswrd } = req.body;
+            const { email, newPassword } = req.body;
+            // const id=
+            const id = req.user?.id || null;
+console.log("newPassword=>",newPassword);
 
             const response = await userService.updatePassword({
                 email,
-                newPasswrd,
+                id,
+                newPassword,
             });
             sendResponse(res, {
                 status: HTTP_STATUS.OK,
@@ -283,7 +371,7 @@ class UserController {
                 data: response,
             });
         } catch (error) {
-            sendCookie(res, {
+            sendResponse(res, {
                 status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
                 success: false,
                 message: "Failed to update password.",
@@ -318,6 +406,23 @@ class UserController {
                 status: HTTP_STATUS.OK,
                 success: true,
                 message: "Status update successfully",
+            });
+        } catch (error) {
+            sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                success: false,
+                error: error.message,
+            });
+        }
+    }
+    async getAllExternalUsers(req, res) {
+        try {
+            const response = await userService.getAllExternalUsers();
+            sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                success: true,
+                message: "Status update successfully",
+                data:response
             });
         } catch (error) {
             sendResponse(res, {

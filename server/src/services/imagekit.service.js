@@ -20,7 +20,7 @@ class ImageKitService {
                 publicId: response.fileId,
             };
         } catch (error) {
-            throw new Error("Image upload failed: " + error.message);
+            throw new Error("Image upload failed: " , error.message);
         }
     }
     
@@ -29,7 +29,7 @@ class ImageKitService {
             const response = await imagekit.deleteFile(publicId);
             return response;
         } catch (error) {
-            throw new Error("Image deletion failed: " + error.message);
+            throw new Error("Image deletion failed: " , error.message);
         }
     }
 }

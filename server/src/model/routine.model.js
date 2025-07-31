@@ -59,6 +59,10 @@ const routineSchema = new Schema(
                             enum: ["user", "normaluser"],
                         },
 
+                        roomNo: {
+                            type: String,
+                            // required: true,
+                        },
                         startTime: {
                             type: String,
                             required: true,

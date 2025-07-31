@@ -18,10 +18,10 @@ const upload = multer({
 router
     .post(
         "/",
+        upload.single("media"),
         validate(noticeboardValidation.create),
         isAuthenticate,
         authorizeRoles("hod"),
-        upload.single("media"),
         noticeboardController.createNotice
     )
     .get("/", noticeboardController.showNotices)

@@ -39,7 +39,25 @@ export const sendCookie = (user, res, message, statusCode = 200) => {
     });
 };
 
-export const removeCookie = (res, message = "Logged out successfully") => {
+// export const removeCookie = (res, message = "Logged out successfully") => {
+//     const cookieOptions = {
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === "production",
+//         sameSite: "lax",
+//         expires: new Date(0), // Expire the cookie immediately
+//         path: "/",
+//     };
+
+//     return res
+//         .status(200)
+//         .cookie("token", "", cookieOptions) // Clear the token
+//         .json({
+//             success: true,
+//             message,
+//         });
+// };
+
+export const removeCookie = (res) => {
     const cookieOptions = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -48,11 +66,5 @@ export const removeCookie = (res, message = "Logged out successfully") => {
         path: "/",
     };
 
-    return res
-        .status(200)
-        .cookie("token", "", cookieOptions) // Clear the token
-        .json({
-            success: true,
-            message,
-        });
+    res.cookie("token", "", cookieOptions); // ✅ Only clear the cookie
 };

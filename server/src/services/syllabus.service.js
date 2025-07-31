@@ -132,19 +132,42 @@ class SyllabusService {
         }
     }
 
-    async showSyllabus(semester) {
-        console.log("Fetching syllabus for department:", semester);
+    // async showSyllabus(semester) {
+    //     console.log("Fetching syllabus for department:", semester);
 
+    //     try {
+    //         const syllabus = await Syllabus.find({ semester: semester });
+    //         console.log("Syllabus fetched:", syllabus);
+    //         return syllabus || [];
+    //     } catch (error) {
+    //         console.error("Error in showSyllabus:", error);
+    //         throw error;
+    //     }
+    // }
+    async showSyllabus(semester, page = 1, limit = 10) {
         try {
-            const syllabus = await Syllabus.find({ semester: semester });
-            console.log("Syllabus fetched:", syllabus);
-            return syllabus || [];
+            const skip = (page - 1) * limit;
+    
+            const [syllabus, total] = await Promise.all([
+                Syllabus.find({ semester })
+                    .skip(skip)
+                    .limit(limit)
+                    .sort({ createdAt: -1 }),
+                Syllabus.countDocuments({ semester }),
+            ]);
+    
+            return {
+                syllabus,
+                total,
+                page,
+                totalPages: Math.ceil(total / limit),
+            };
         } catch (error) {
             console.error("Error in showSyllabus:", error);
             throw error;
         }
     }
-
+    
     async deleteSyllabus(id) {
         try {
             const syllabus = await Syllabus.findByIdAndDelete(id);

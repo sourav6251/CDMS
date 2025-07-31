@@ -13,7 +13,7 @@ class UserValidation {
                 .string()
                 .trim()
                 .min(8, "Password must be at least 8 characters"),
-            role: z.enum(["faculty", "external", "student", "admin"], {
+            role: z.enum(["faculty", "external", "student", "admin", "hod"], {  //todo Remove Admin ,HOD
                 message: "only faculty external student roles are accepeted",
             }),
         }),
@@ -45,8 +45,8 @@ class UserValidation {
     });
 
     sendOtp = z.object({
-        params: z.object({
-            userID: z.string(),
+        body: z.object({
+            email: z.string(),
         }),
         // body: z.object({
         //     email: z.string().email("Invalid email format"),
@@ -70,7 +70,7 @@ class UserValidation {
     updatePassword = z.object({
         body: z.object({
             email: z.string().email("Invalid email format"),
-            newPasswrd: z
+            newPassword: z
                 .string()
                 .min(8, "New password must be at least 8 characters"),
         }),

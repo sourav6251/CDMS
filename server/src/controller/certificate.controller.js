@@ -7,14 +7,16 @@ class CertificateController {
     // Create a certificate
     async createCertificate(req, res) {
         const { id } = req.user;
+        const { role } = req.user;
         const {
             memoNumber,
             userID,
             designation,
             department,
-            college,
+            institutionName,
             address,
             examType,
+            subject,
             year,
             semester,
             degree,
@@ -27,17 +29,26 @@ class CertificateController {
             status,
             CertificateType,
             nonExistUser,
+            honorifics,
+            gender,
+            institutionType,
+            examStartTime,
+            examEndTime,
         } = req.body;
+        console.log("userID=>",userID);
+        
         try {
             const certificate = await certificateService.createCertificate({
                 id, // creator's ID (authenticated user)
                 memoNumber,
                 userID,
+                role,
                 designation,
                 department,
-                college,
+                institutionName,
                 address,
                 examType,
+                subject,
                 year,
                 semester,
                 degree,
@@ -50,6 +61,11 @@ class CertificateController {
                 status,
                 CertificateType,
                 nonExistUser,
+                honorifics,
+                gender,
+                institutionType,
+                examStartTime,
+                examEndTime,
             });
 
             return sendResponse(res, {
@@ -80,47 +96,66 @@ class CertificateController {
     // Update a certificate
     async updateCertificate(req, res) {
         const {
+            _id,
             memoNumber,
+            address,
+            creator,
+            user,
+            honorifics,
+            userModel,
+            CertificateType,
             designation,
             department,
-            college,
-            address,
-            examType,
-            year,
-            semester,
+            institutionType,
+            institutionName,
             degree,
-            paperCode,
+            semester,
+            subject,
             paperName,
+            dateOfExamination,
+            examStartTime,
+            examEndTime,
+            gender,
             studentsNo,
             examinersNo,
-            dateOfExamination,
-            timeOfExamination,
+            examType,
+            nonExistUser,
             status,
-            CertificateType,
+            createdAt,
+          //   updatedAt,
+          //   __v: number;
         } = req.body;
-        const certificateId = req.params.certificateId;
-        console.log("certificateId=>>", certificateId);
+        // const certificateId = req.params.certificateId;
+        // console.log("certificateId=>>", certificateId);
 
         try {
             const certificate = await certificateService.updateCertificate({
-                certificateId,
+                _id,
                 memoNumber,
+                address,
+                creator,
+                user,
+                honorifics,
+                userModel,
+                CertificateType,
                 designation,
                 department,
-                college,
-                address,
-                examType,
-                year,
-                semester,
+                institutionType,
+                institutionName,
                 degree,
-                paperCode,
+                semester,
+                subject,
                 paperName,
+                dateOfExamination,
+                examStartTime,
+                examEndTime,
+                gender,
                 studentsNo,
                 examinersNo,
-                dateOfExamination,
-                timeOfExamination,
+                examType,
+                nonExistUser,
                 status,
-                CertificateType,
+                createdAt,
             });
 
             return sendResponse(res, {
@@ -145,9 +180,9 @@ class CertificateController {
 
     //update certificate status
     async updateCertificatestatus(req, res) {
-        console.log("updateCertificatestatus");
 
         const { memoNumber, status } = req.body;
+        console.log("updateCertificatestatus",memoNumber, status );
         const certificateId = req.params.certificateId;
         try {
             const certificate =
@@ -192,11 +227,67 @@ class CertificateController {
             }
 
             return sendResponse(res, {
-                status: HTTP_STATUS.NO_CONTENT,
+                status: HTTP_STATUS.OK,
                 message: RESPONSE_MESSAGES.NO_CERTIFICATE,
                 success: true,
                 data: certificates,
             });
+        } catch (error) {
+            console.log(error);
+
+            return sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                message: RESPONSE_MESSAGES.INTERNAL_ERROR,
+                success: false,
+                error: error,
+            });
+        }
+    }
+        // Show all certificates (with optional filters)
+    async pendingCertificateRequest(req, res) {
+        try {
+            const certificates = await certificateService.pendingCertificateRequest();
+
+            if (certificates && certificates.length > 0) {
+                return sendResponse(res, {
+                    status: HTTP_STATUS.OK,
+                    message: RESPONSE_MESSAGES.CERTIFICATE_GET,
+                    success: true,
+                    data: certificates,
+                });
+            }
+
+            return sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                message: RESPONSE_MESSAGES.NO_CERTIFICATE,
+                success: true,
+                data: certificates,
+            });
+        } catch (error) {
+            console.log(error);
+
+            return sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                message: RESPONSE_MESSAGES.INTERNAL_ERROR,
+                success: false,
+                error: error,
+            });
+        }
+    }
+    
+    async showExternalCertificates(req, res) {
+
+        const {id}=req.user;
+        try {
+            const certificates = await certificateService.showExternalCertificates(id);
+
+                return sendResponse(res, {
+                    status: HTTP_STATUS.OK,
+                    message: RESPONSE_MESSAGES.CERTIFICATE_GET,
+                    success: true,
+                    data: certificates,
+                });
+       
         } catch (error) {
             console.log(error);
 

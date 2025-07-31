@@ -5,25 +5,30 @@ import { NormalUser } from "../model/normaluser.model.js";
 import mailService from "./mail.service.js";
 
 class UserService {
-    async createUser({ password, email, name, role }) {
+    async createUser({ password, email, name, role,phoneNo }) {
         if (role === "hod") {
             throw new Error("Can not create HOD");
         }
 
-        if (await this.isExist(email)) {
-            console.log("User already exist=>>");
+        if (await this.isExistByEmail(email) ) {
+            console.log("User already exist=>>",email);
+
+            throw new Error("User already exist");
+        }    
+            if (await this.isExistByPhone(phoneNo) ) {
+            console.log("User already existphoneNo=>>",phoneNo);
 
             throw new Error("User already exist");
         }
         try {
-            await Users.create({ name, email, password, role });
+            return await Users.create({ name, email, password, role ,phoneNo});
         } catch (error) {
             throw new Error(error.message);
         }
     }
 
     async createHod({ email, name, password }) {
-        if (await this.isExist(email)) {
+        if (await this.isExistByEmail(email)) {
             throw new Error("User already exist");
         }
         try {
@@ -41,10 +46,17 @@ class UserService {
     }
 
     //todo: add email
-    async generateOtp(id) {
+    async generateOtp(email,id) {
         const otp = genarate6DigitOtp();
-        try {
-            let user = await Users.findById(id);
+        try {let user;
+            if (email) {
+                
+             user = await Users.findOne({ email });
+            }
+            else {
+
+             user = await Users.findById(id);
+            }
             user.otp = otp;
             user.otpExpiary = Date.now() + 5 * 60 * 1000; // OTP valid for 5 minutes
             await user.save();
@@ -52,16 +64,22 @@ class UserService {
                 name: user.name,
                 otp,
             };
-           await mailService.sendMailForOTP(user.email, data);
+            await mailService.sendMailForOTP(user.email, data);
             return "success";
         } catch (error) {
-            throw new Error("User not found");
+            throw new Error(error);
         }
     }
 
-    async verifyOtp({ otp, email }) {
+    async verifyOtp({ otp, email ,id}) {
         try {
-            let user = await Users.findOne({ email }).select("+otp ");
+            let user;
+            if(email){
+                user = await Users.findOne({ email }).select("+otp ");
+            }else{
+
+                user = await Users.findById(id).select("+otp ");
+            }
             if (!user) {
                 throw new Error("User not found");
             }
@@ -110,16 +128,69 @@ class UserService {
             throw new Error("User not found");
         }
     }
-
     async getAllUser() {
         try {
-            const users = await Users.find().select("name email role");
-            return users;
+            const normalUsers = await NormalUser.find().select("name email").lean();
+            const users = await Users.find().select("name email role").lean();
+    
+            // Tag each user with model name
+            const taggedNormalUsers = normalUsers.map((user) => ({
+                ...user,
+                model: "normaluser",
+            }));
+    
+            const taggedUsers = users.map((user) => ({
+                ...user,
+                model: "user",
+            }));
+    
+            const combinedUsers = [...taggedNormalUsers, ...taggedUsers];
+            return combinedUsers;
         } catch (error) {
+            console.error("getAllUser error:", error);
             throw new Error("Failed to fetch users");
         }
     }
-
+    async getAllRegisterUser() {
+        try {
+            // const normalUsers = await NormalUser.find().select("name email").lean();
+            const users = await Users.find();
+    
+       
+            return users;
+        } catch (error) {
+            console.error("getAllUser error:", error);
+            throw new Error("Failed to fetch users");
+        }
+    }
+    
+    async getAllUnregisterUser() {
+        try {
+            // const normalUsers = await NormalUser.find().select("name email").lean();
+            const users = await NormalUser.find();
+    
+       
+            return users;
+        } catch (error) {
+            console.error("getAllUser error:", error);
+            throw new Error("Failed to fetch users");
+        }
+    }
+    
+    
+    async getAllRegisterRequestUser() {
+        try {
+            // const normalUsers = await NormalUser.find().select("name email").lean();
+            const users = await Users.find({isApproved:false});
+    
+       
+            return users;
+        } catch (error) {
+            console.error("getAllUser error:", error);
+            throw new Error("Failed to fetch users");
+        }
+    }
+    
     async deleteUser(id) {
         try {
             const response = await Users.findByIdAndDelete(id);
@@ -130,7 +201,7 @@ class UserService {
                 name: response.name,
                 email: response.email,
             };
-            mailService.sendMailForDelete(response.email,data);
+            mailService.sendMailForDelete(response.email, data);
         } catch (error) {
             throw new Error(error.message);
         }
@@ -149,7 +220,7 @@ class UserService {
         }
     }
 
-    async updateUser({ id, name, email, bufferFile, originalName }) {
+    async updateUser({ id, name, email,phoneNo, bufferFile, originalName }) {
         try {
             let user = await Users.findById(id);
             if (!user) {
@@ -175,6 +246,7 @@ class UserService {
             // Update common fields
             user.name = name;
             user.email = email;
+            user.phoneNo=phoneNo;
             await user.save();
 
             return user; // ✅ always return updated user
@@ -183,15 +255,23 @@ class UserService {
         }
     }
 
-    async updatePassword({ email, newPassword }) {
-        try {
-            let user = await Users.findOne({ email }).select("+password");
+    async updatePassword({ email,id, newPassword }) {
+        try {  let user ;
+            if (email) {
+                user = await Users.findOne({ email }).select("+password");   
+            }
+            else{
+
+                user = await Users.findById(id).select("+password");  
+            }
 
             if (!user) {
                 throw new Error("User not found");
             }
 
             user.password = newPassword; // This will trigger the `pre('save')` middleware to hash
+            console.log("user=>",user);
+            
             await user.save();
             return "Password updated successfully";
         } catch (error) {
@@ -199,8 +279,11 @@ class UserService {
         }
     }
 
-    async isExist(email) {
+    async isExistByEmail(email) {
         return await Users.findOne({ email });
+    }
+    async isExistByPhone(phoneNo) {
+        return await Users.findOne({ phoneNo });
     }
     async approveByHOD(id) {
         try {
@@ -214,5 +297,41 @@ class UserService {
             throw new Error(error.message);
         }
     }
+     getAllExternalUsers = async () => {
+        try {
+          // Fetch from NormalUser
+          const normalUsers = await NormalUser.find({}, { name: 1, email: 1 }).lean();
+      
+          // Fetch from Users with role "external"
+          const externalUsers = await Users.find(
+            { role: "external" },
+            { name: 1, email: 1 }
+          ).lean();
+      
+          // Format NormalUser data
+          const formattedNormalUsers = normalUsers.map((user) => ({
+            userId: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            userModel: "normaluser",
+          }));
+          // Format External User data
+          const formattedExternalUsers = externalUsers.map((user) => ({
+            userId: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            userModel: "user",
+          }));
+      
+          // Combine both
+          const combinedUsers = [...formattedNormalUsers, ...formattedExternalUsers];
+      
+          return combinedUsers;
+        } catch (error) {
+          console.error("Error fetching users:", error);
+          throw new Error("Failed to fetch users");
+        }
+      };
+      
 }
 export default new UserService();

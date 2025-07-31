@@ -20,7 +20,7 @@ export const validate = (schema) => (req, res, next) => {
     }))
 
     // Send validation error response
-    console.log(errors);
+    console.log("validate=>",errors);
     
     return res.status(HTTP_STATUS.BAD_REQUEST).json({
       success: false,

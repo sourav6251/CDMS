@@ -11,6 +11,8 @@ class RoutineController {
                 semester,
                 paperCode,
                 paperName,
+                roomNo,
+                professormodel,
                 professorID,
                 professorName,
                 dayName,
@@ -18,20 +20,12 @@ class RoutineController {
                 endTime,
             } = req.body;
 
-            // Validation: Either professorID or professorName must be provided, not both or neither
-            // if ((professorID && professorName) || (!professorID && !professorName)) {
-            //     return sendResponse(res, {
-            //         status: HTTP_STATUS.BAD_REQUEST,
-            //         message:
-            //             "Either 'professorID' or 'professorName' must be provided (but not both or neither).",
-            //         success: false,
-            //     });
-            // }
-
             const routine = await routineService.createRoutine({
                 semester,
                 paperCode,
                 paperName,
+                roomNo,
+                professormodel,
                 professorID,
                 professorName,
                 dayName,
@@ -41,7 +35,7 @@ class RoutineController {
 
             return sendResponse(res, {
                 status: HTTP_STATUS.CREATED,
-                message: RESPONSE_MESSAGES.ROUTINE_CREATED,
+                message: RESPONSE_MESSAGES.ROUTINE_CREATED ||"Routine created",
                 success: true,
                 data: routine,
             });
@@ -83,11 +77,38 @@ class RoutineController {
             const { semester } = req.params;
 
             const routines = await routineService.showRoutine(semester);
-            if (!routines || routines.length === 0) {
-                return sendResponse(res, {
-                    status: HTTP_STATUS.NO_CONTENT,
-                });
-            }
+            // if (!routines || routines.length === 0) {
+            //     return sendResponse(res, {
+            //         status: HTTP_STATUS.NO_CONTENT,
+            //     });
+            // }
+
+            return sendResponse(res, {
+                status: HTTP_STATUS.OK,
+                message: RESPONSE_MESSAGES.ROUTINE_GET,
+                success: true,
+                data: routines,
+            });
+        } catch (error) {
+            return sendResponse(res, {
+                status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                message: RESPONSE_MESSAGES.INTERNAL_ERROR,
+                success: false,
+                error: error.message,
+            });
+        }
+    }  
+    
+     async classRoutine(req, res) {
+        try {
+            const { id } = req.user;
+
+            const routines = await routineService.getUserScheduleForToday(id);
+            // if (!routines || routines.length === 0) {
+            //     return sendResponse(res, {
+            //         status: HTTP_STATUS.NO_CONTENT,
+            //     });
+            // }
 
             return sendResponse(res, {
                 status: HTTP_STATUS.OK,

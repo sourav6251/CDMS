@@ -27,6 +27,9 @@ const userSchema = new Schema({
         required: [true, 'password is reqired!'],
         select: false 
     },
+    phoneNo:{
+        type: String,
+    },
     profile_pic: {
         url: {
             type: String,

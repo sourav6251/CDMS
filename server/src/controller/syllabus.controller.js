@@ -9,8 +9,13 @@ class SyllabusController {
             const { semester, paperName, paperCode } = req.body;
             const media = req.file;
             const user = req.user._id;
-            const bufferFile = req.file.buffer;
-            const originalName = req.file.originalname;
+            let bufferFile;
+                let originalName;
+            if (req.file && req.file.buffer && req.file.originalname) {
+                 bufferFile = req.file.buffer;
+                 originalName = req.file.originalname;
+                // proceed with bufferFile and originalName
+            }
             console.log("req.body => ", req.body);
             if (!req.file) {
                 return sendResponse(res, {
@@ -112,20 +117,46 @@ class SyllabusController {
         }
     }
 
+    // async showSyllabus(req, res) {
+    //     try {
+    //         const syllabus = await syllabusService.showSyllabus(
+    //             req.query.semester
+    //         );
+    //         let status = HTTP_STATUS.OK;
+    //         if (!syllabus || syllabus.length === 0) {
+    //             status = HTTP_STATUS.OK;
+    //         }
+    //         return sendResponse(res, {
+    //             message: RESPONSE_MESSAGES.SYLLABUS_FETCHED,
+    //             status: status,
+    //             success: true,
+    //             data: syllabus || [],
+    //         });
+    //     } catch (error) {
+    //         console.error("Show syllabus error:", error);
+    //         return sendResponse(res, {
+    //             status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    //             message: RESPONSE_MESSAGES.INTERNAL_ERROR,
+    //             success: false,
+    //         });
+    //     }
+    // }
+
     async showSyllabus(req, res) {
         try {
-            const syllabus = await syllabusService.showSyllabus(
-                req.query.semester
+            const { semester, page = 1, limit = 10 } = req.query;
+    
+            const result = await syllabusService.showSyllabus(
+                semester,
+                parseInt(page),
+                parseInt(limit)
             );
-            let status = HTTP_STATUS.OK;
-            if (!syllabus || syllabus.length === 0) {
-                status = HTTP_STATUS.NO_CONTENT;
-            }
+    
             return sendResponse(res, {
                 message: RESPONSE_MESSAGES.SYLLABUS_FETCHED,
-                status: status,
+                status: HTTP_STATUS.OK,
                 success: true,
-                data: syllabus || [],
+                data: result,
             });
         } catch (error) {
             console.error("Show syllabus error:", error);
@@ -136,7 +167,7 @@ class SyllabusController {
             });
         }
     }
-
+    
     async deleteSyllabus(req, res) {
         try {
             const syllabus = await syllabusService.deleteSyllabus(

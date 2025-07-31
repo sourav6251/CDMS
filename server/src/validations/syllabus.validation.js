@@ -17,7 +17,7 @@ class SyllabusValidation {
                 .string({
                     required_error: "Paper name is required",
                 })
-                .min(3, "Paper name must be at least 3 characters")
+                .min(1, "Paper name must be at least 3 characters")
                 .max(30, "Paper name must not exceed 30 characters")
                 .trim(),
         }),
